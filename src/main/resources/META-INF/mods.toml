@@ -1,0 +1,26 @@
+modLoader="javafml"
+loaderVersion="[33,)"
+issueTrackerURL="https://github.com/cech12/BrickShears/issues"
+license="The MIT License (MIT)"
+[[mods]]
+    modId="brickhopper"
+    version="${file.jarVersion}"
+    displayName="Brick Hopper"
+    displayURL="https://github.com/cech12/BrickHopper"
+    logoFile="logo.png"
+    authors="Cech12"
+    description='''
+    A mod which adds a Brick Hopper.
+    '''
+[[dependencies.brickhopper]]
+    modId="forge"
+    mandatory=true
+    versionRange="[33.0.21,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.brickhopper]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.16.2,)"
+    ordering="NONE"
+    side="BOTH"

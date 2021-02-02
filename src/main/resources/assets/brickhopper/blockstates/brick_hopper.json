@@ -1,0 +1,22 @@
+{
+    "variants": {
+        "facing=down": {
+            "model": "brickhopper:block/brick_hopper"
+        },
+        "facing=east": {
+            "model": "brickhopper:block/brick_hopper_side",
+            "y": 90
+        },
+        "facing=north": {
+            "model": "brickhopper:block/brick_hopper_side"
+        },
+        "facing=south": {
+            "model": "brickhopper:block/brick_hopper_side",
+            "y": 180
+        },
+        "facing=west": {
+            "model": "brickhopper:block/brick_hopper_side",
+            "y": 270
+        }
+    }
+}
