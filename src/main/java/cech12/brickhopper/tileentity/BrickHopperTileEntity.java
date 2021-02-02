@@ -159,7 +159,7 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
                 if (!this.isEmpty()) {
                     flag = this.transferItemsOut();
                 }
-                if (!isFull(this.inventory)) {
+                if (isNotFull(this.inventory)) {
                     flag |= p_200109_1_.get();
                 }
                 if (flag) {
@@ -216,14 +216,14 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
         return getItemHandler(hopper.getWorld(), x, y, z, hopperFacing.getOpposite());
     }
 
-    private static boolean isFull(IItemHandler itemHandler) {
+    private static boolean isNotFull(IItemHandler itemHandler) {
         for (int slot = 0; slot < itemHandler.getSlots(); slot++) {
             ItemStack stackInSlot = itemHandler.getStackInSlot(slot);
             if (stackInSlot.isEmpty() || stackInSlot.getCount() < itemHandler.getSlotLimit(slot)) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     private static boolean isEmpty(IItemHandler itemHandler) {
@@ -258,7 +258,7 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
                 .map(destinationResult -> {
                     IItemHandler itemHandler = destinationResult.getKey();
                     Object destination = destinationResult.getValue();
-                    if (!isFull(itemHandler)) {
+                    if (isNotFull(itemHandler)) {
                         for (int i = 0; i < this.getSizeInventory(); ++i) {
                             if (!this.getStackInSlot(i).isEmpty()) {
                                 ItemStack originalSlotContents = this.getStackInSlot(i).copy();

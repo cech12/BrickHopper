@@ -4,8 +4,6 @@ import cech12.brickhopper.BrickHopperMod;
 import cech12.brickhopper.api.block.BrickHopperBlocks;
 import cech12.brickhopper.block.BrickHopperBlock;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.item.BlockItem;
