@@ -27,6 +27,7 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.LazyOptional; //1.15
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -36,7 +37,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Optional;
+//import java.util.Optional; //1.16
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -51,8 +52,8 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
     }
 
     @Override
-    public void read(@Nonnull BlockState state, @Nonnull CompoundNBT nbt) {
-        super.read(state, nbt);
+    public void read(@Nonnull CompoundNBT nbt) { //1.15
+        super.read(nbt); //1.15
         inventory = new ItemStackHandler(3);
         if (!this.checkLootAndRead(nbt)) {
             this.inventory.deserializeNBT(nbt);
@@ -159,7 +160,7 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
                 if (!this.isEmpty()) {
                     flag = this.transferItemsOut();
                 }
-                if (!isFull(this.inventory)) {
+                if (isNotFull(this.inventory)) {
                     flag |= p_200109_1_.get();
                 }
                 if (flag) {
@@ -209,21 +210,21 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
         return stack;
     }
 
-    private static Optional<Pair<IItemHandler, Object>> getItemHandler(IHopper hopper, Direction hopperFacing) {
+    private static LazyOptional<Pair<IItemHandler, Object>> getItemHandler(IHopper hopper, Direction hopperFacing) { //1.15
         double x = hopper.getXPos() + (double) hopperFacing.getXOffset();
         double y = hopper.getYPos() + (double) hopperFacing.getYOffset();
         double z = hopper.getZPos() + (double) hopperFacing.getZOffset();
         return getItemHandler(hopper.getWorld(), x, y, z, hopperFacing.getOpposite());
     }
 
-    private static boolean isFull(IItemHandler itemHandler) {
+    private static boolean isNotFull(IItemHandler itemHandler) {
         for (int slot = 0; slot < itemHandler.getSlots(); slot++) {
             ItemStack stackInSlot = itemHandler.getStackInSlot(slot);
             if (stackInSlot.isEmpty() || stackInSlot.getCount() < itemHandler.getSlotLimit(slot)) {
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     private static boolean isEmpty(IItemHandler itemHandler) {
@@ -236,7 +237,7 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
         return true;
     }
 
-    public static Optional<Pair<IItemHandler, Object>> getItemHandler(World worldIn, double x, double y, double z, final Direction side) {
+    public static LazyOptional<Pair<IItemHandler, Object>> getItemHandler(World worldIn, double x, double y, double z, final Direction side) { //1.15
         int i = MathHelper.floor(x);
         int j = MathHelper.floor(y);
         int k = MathHelper.floor(z);
@@ -249,7 +250,7 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
                         .map(capability -> ImmutablePair.of(capability, tileentity));
             }
         }
-        return Optional.empty();
+        return LazyOptional.empty(); //1.15
     }
 
     private boolean transferItemsOut() {
@@ -258,7 +259,7 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
                 .map(destinationResult -> {
                     IItemHandler itemHandler = destinationResult.getKey();
                     Object destination = destinationResult.getValue();
-                    if (!isFull(itemHandler)) {
+                    if (isNotFull(itemHandler)) {
                         for (int i = 0; i < this.getSizeInventory(); ++i) {
                             if (!this.getStackInSlot(i).isEmpty()) {
                                 ItemStack originalSlotContents = this.getStackInSlot(i).copy();
