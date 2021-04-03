@@ -1,3 +1,5 @@
 {
-  "block.brickhopper.brick_hopper": "Кирпичная воронка"
+  "block.brickhopper.brick_hopper": "Кирпичная воронка",
+  "block.brickhopper.brick_hopper.desc.cannotAbsorbItemsFromWorld": "Cannot pull item entities lying above it.",
+  "block.brickhopper.brick_hopper.desc.cannotAbsorbItemsFromInventories": "Cannot pull items from inventories above it."
 }
