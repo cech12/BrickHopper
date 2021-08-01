@@ -1,0 +1,5 @@
+{
+  "block.brickhopper.brick_hopper": "Цегляна воронка",
+  "block.brickhopper.brick_hopper.desc.cannotAbsorbItemsFromWorld": "Не затягує предмети, які лежать над нею.",
+  "block.brickhopper.brick_hopper.desc.cannotAbsorbItemsFromInventories": "Не затягує предмети з инвентарей над нею."
+}
