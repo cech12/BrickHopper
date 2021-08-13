@@ -17,8 +17,8 @@ public class BrickHopperContainer extends Container {
     public BrickHopperContainer(int id, PlayerInventory playerInventory, BrickHopperTileEntity inventory) {
         super(BrickHopperContainerTypes.BRICK_HOPPER, id);
         this.hopper = inventory;
-        assertInventorySize(inventory, 3);
-        inventory.openInventory(playerInventory.player);
+        checkContainerSize(inventory, 3);
+        inventory.startOpen(playerInventory.player);
         //hopper slots
         for(int j = 0; j < 3; ++j) {
             this.addSlot(new Slot(inventory, j, 62 + j * 18, 20));
@@ -36,15 +36,15 @@ public class BrickHopperContainer extends Container {
     }
 
     public BrickHopperContainer(int id, PlayerInventory playerInventoryIn, BlockPos pos) {
-        this(id, playerInventoryIn, (BrickHopperTileEntity) playerInventoryIn.player.world.getTileEntity(pos));
+        this(id, playerInventoryIn, (BrickHopperTileEntity) playerInventoryIn.player.level.getBlockEntity(pos));
     }
 
     /**
      * Determines whether supplied player can use this container
      */
     @Override
-    public boolean canInteractWith(@Nonnull PlayerEntity playerIn) {
-        return this.hopper.isUsableByPlayer(playerIn);
+    public boolean stillValid(@Nonnull PlayerEntity playerIn) {
+        return this.hopper.stillValid(playerIn);
     }
 
     /**
@@ -53,24 +53,24 @@ public class BrickHopperContainer extends Container {
      */
     @Override
     @Nonnull
-    public ItemStack transferStackInSlot(@Nonnull PlayerEntity playerIn, int index) {
+    public ItemStack quickMoveStack(@Nonnull PlayerEntity playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
-        Slot slot = this.inventorySlots.get(index);
-        if (slot != null && slot.getHasStack()) {
-            ItemStack itemstack1 = slot.getStack();
+        Slot slot = this.slots.get(index);
+        if (slot != null && slot.hasItem()) {
+            ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
-            if (index < this.hopper.getSizeInventory()) {
-                if (!this.mergeItemStack(itemstack1, this.hopper.getSizeInventory(), this.inventorySlots.size(), true)) {
+            if (index < this.hopper.getContainerSize()) {
+                if (!this.moveItemStackTo(itemstack1, this.hopper.getContainerSize(), this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.mergeItemStack(itemstack1, 0, this.hopper.getSizeInventory(), false)) {
+            } else if (!this.moveItemStackTo(itemstack1, 0, this.hopper.getContainerSize(), false)) {
                 return ItemStack.EMPTY;
             }
 
             if (itemstack1.isEmpty()) {
-                slot.putStack(ItemStack.EMPTY);
+                slot.set(ItemStack.EMPTY);
             } else {
-                slot.onSlotChanged();
+                slot.setChanged();
             }
         }
 
@@ -81,8 +81,8 @@ public class BrickHopperContainer extends Container {
      * Called when the container is closed.
      */
     @Override
-    public void onContainerClosed(@Nonnull PlayerEntity playerIn) {
-        super.onContainerClosed(playerIn);
-        this.hopper.closeInventory(playerIn);
+    public void removed(@Nonnull PlayerEntity playerIn) {
+        super.removed(playerIn);
+        this.hopper.stopOpen(playerIn);
     }
 }

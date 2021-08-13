@@ -15,16 +15,18 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import net.minecraft.block.AbstractBlock;
+
 @Mod.EventBusSubscriber(modid= BrickHopperMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public final class ModBlocks {
 
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
-        BrickHopperBlocks.BRICK_HOPPER = registerBlock("brick_hopper", ItemGroup.REDSTONE, new BrickHopperBlock(Block.Properties.create(Material.ROCK, MaterialColor.RED).harvestTool(ToolType.PICKAXE).setRequiresTool().hardnessAndResistance(2.0F, 6.0F).notSolid()));
+        BrickHopperBlocks.BRICK_HOPPER = registerBlock("brick_hopper", ItemGroup.TAB_REDSTONE, new BrickHopperBlock(AbstractBlock.Properties.of(Material.STONE, MaterialColor.COLOR_RED).harvestTool(ToolType.PICKAXE).requiresCorrectToolForDrops().strength(2.0F, 6.0F).noOcclusion()));
     }
 
     public static Block registerBlock(String name, ItemGroup itemGroup, Block block) {
-        Item.Properties itemProperties = new Item.Properties().group(itemGroup);
+        Item.Properties itemProperties = new Item.Properties().tab(itemGroup);
         BlockItem itemBlock = new BlockItem(block, itemProperties);
         block.setRegistryName(name);
         itemBlock.setRegistryName(name);

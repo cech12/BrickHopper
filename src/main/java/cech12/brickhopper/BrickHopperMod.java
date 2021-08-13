@@ -39,7 +39,7 @@ public class BrickHopperMod {
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void onClientRegister(FMLClientSetupEvent event) {
-        ScreenManager.registerFactory((ContainerType<BrickHopperContainer>) BRICK_HOPPER, BrickHopperScreen::new);
+        ScreenManager.register((ContainerType<BrickHopperContainer>) BRICK_HOPPER, BrickHopperScreen::new);
     }
 
 }
