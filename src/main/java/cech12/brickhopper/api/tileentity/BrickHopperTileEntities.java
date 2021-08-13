@@ -1,9 +1,9 @@
 package cech12.brickhopper.api.tileentity;
 
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public class BrickHopperTileEntities {
 
-    public static TileEntityType<?> BRICK_HOPPER;
+    public static BlockEntityType<?> BRICK_HOPPER;
 
 }

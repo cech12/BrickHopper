@@ -3,8 +3,8 @@ package cech12.brickhopper;
 import cech12.brickhopper.client.BrickHopperScreen;
 import cech12.brickhopper.config.ServerConfig;
 import cech12.brickhopper.inventory.BrickHopperContainer;
-import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegistryEvent;
@@ -32,14 +32,14 @@ public class BrickHopperMod {
     }
 
     @SubscribeEvent
-    public static void registerContainers(RegistryEvent.Register<ContainerType<?>> event) {
+    public static void registerContainers(RegistryEvent.Register<MenuType<?>> event) {
         event.getRegistry().register(BRICK_HOPPER);
     }
 
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void onClientRegister(FMLClientSetupEvent event) {
-        ScreenManager.register((ContainerType<BrickHopperContainer>) BRICK_HOPPER, BrickHopperScreen::new);
+        MenuScreens.register((MenuType<BrickHopperContainer>) BRICK_HOPPER, BrickHopperScreen::new);
     }
 
 }

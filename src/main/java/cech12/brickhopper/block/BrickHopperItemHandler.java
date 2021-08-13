@@ -2,7 +2,7 @@ package cech12.brickhopper.block;
 
 import cech12.brickhopper.config.ServerConfig;
 import cech12.brickhopper.tileentity.BrickHopperTileEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
 import javax.annotation.Nonnull;

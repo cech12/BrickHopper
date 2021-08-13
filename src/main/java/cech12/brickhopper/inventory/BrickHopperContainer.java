@@ -2,19 +2,19 @@ package cech12.brickhopper.inventory;
 
 import cech12.brickhopper.api.inventory.BrickHopperContainerTypes;
 import cech12.brickhopper.tileentity.BrickHopperTileEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
 
 import javax.annotation.Nonnull;
 
-public class BrickHopperContainer extends Container {
+public class BrickHopperContainer extends AbstractContainerMenu {
     private final BrickHopperTileEntity hopper;
 
-    public BrickHopperContainer(int id, PlayerInventory playerInventory, BrickHopperTileEntity inventory) {
+    public BrickHopperContainer(int id, Inventory playerInventory, BrickHopperTileEntity inventory) {
         super(BrickHopperContainerTypes.BRICK_HOPPER, id);
         this.hopper = inventory;
         checkContainerSize(inventory, 3);
@@ -35,7 +35,7 @@ public class BrickHopperContainer extends Container {
         }
     }
 
-    public BrickHopperContainer(int id, PlayerInventory playerInventoryIn, BlockPos pos) {
+    public BrickHopperContainer(int id, Inventory playerInventoryIn, BlockPos pos) {
         this(id, playerInventoryIn, (BrickHopperTileEntity) playerInventoryIn.player.level.getBlockEntity(pos));
     }
 
@@ -43,7 +43,7 @@ public class BrickHopperContainer extends Container {
      * Determines whether supplied player can use this container
      */
     @Override
-    public boolean stillValid(@Nonnull PlayerEntity playerIn) {
+    public boolean stillValid(@Nonnull Player playerIn) {
         return this.hopper.stillValid(playerIn);
     }
 
@@ -53,7 +53,7 @@ public class BrickHopperContainer extends Container {
      */
     @Override
     @Nonnull
-    public ItemStack quickMoveStack(@Nonnull PlayerEntity playerIn, int index) {
+    public ItemStack quickMoveStack(@Nonnull Player playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
         if (slot != null && slot.hasItem()) {
@@ -81,7 +81,7 @@ public class BrickHopperContainer extends Container {
      * Called when the container is closed.
      */
     @Override
-    public void removed(@Nonnull PlayerEntity playerIn) {
+    public void removed(@Nonnull Player playerIn) {
         super.removed(playerIn);
         this.hopper.stopOpen(playerIn);
     }

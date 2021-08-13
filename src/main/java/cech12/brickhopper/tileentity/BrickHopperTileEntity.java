@@ -4,31 +4,30 @@ import cech12.brickhopper.api.tileentity.BrickHopperTileEntities;
 import cech12.brickhopper.block.BrickHopperItemHandler;
 import cech12.brickhopper.config.ServerConfig;
 import cech12.brickhopper.inventory.BrickHopperContainer;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HopperBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventoryProvider;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.IHopper;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.LockableLootTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.EntityPredicates;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.HopperBlock;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.WorldlyContainerHolder;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.Hopper;
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -43,19 +42,19 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class BrickHopperTileEntity extends LockableLootTileEntity implements IHopper, ITickableTileEntity {
+public class BrickHopperTileEntity extends RandomizableContainerBlockEntity implements Hopper {
 
     private ItemStackHandler inventory = new ItemStackHandler(3);
     private int transferCooldown = -1;
     private long tickedGameTime;
 
-    public BrickHopperTileEntity() {
-        super(BrickHopperTileEntities.BRICK_HOPPER);
+    public BrickHopperTileEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
+        super(BrickHopperTileEntities.BRICK_HOPPER, pos, state);
     }
 
     @Override
-    public void load(@Nonnull BlockState state, @Nonnull CompoundNBT nbt) {
-        super.load(state, nbt);
+    public void load(@Nonnull CompoundTag nbt) {
+        super.load(nbt);
         inventory = new ItemStackHandler(3);
         if (!this.tryLoadLootTable(nbt)) {
             this.inventory.deserializeNBT(nbt);
@@ -65,7 +64,7 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
 
     @Override
     @Nonnull
-    public CompoundNBT save(@Nonnull CompoundNBT compound) {
+    public CompoundTag save(@Nonnull CompoundTag compound) {
         super.save(compound);
         if (!this.trySaveLootTable(compound)) {
             compound.merge(this.inventory.serializeNBT());
@@ -139,18 +138,17 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
 
     @Override
     @Nonnull
-    protected ITextComponent getDefaultName() {
-        return new TranslationTextComponent("block.brickhopper.brick_hopper");
+    protected Component getDefaultName() {
+        return new TranslatableComponent("block.brickhopper.brick_hopper");
     }
 
-    @Override
-    public void tick() {
-        if (this.level != null && !this.level.isClientSide) {
-            this.transferCooldown--;
-            this.tickedGameTime = this.level.getGameTime();
-            if (!this.isOnTransferCooldown()) {
-                this.setTransferCooldown(0);
-                this.updateHopper(() -> pullItems(this));
+    public static void tick(Level level, BlockPos pos, BlockState state, BrickHopperTileEntity entity) {
+        if (level != null && !level.isClientSide) {
+            entity.transferCooldown--;
+            entity.tickedGameTime = level.getGameTime();
+            if (!entity.isOnTransferCooldown()) {
+                entity.setTransferCooldown(0);
+                entity.updateHopper(entity::pullItems);
             }
         }
     }
@@ -173,14 +171,14 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
         }
     }
 
-    private static ItemStack putStackInInventoryAllSlots(TileEntity source, Object destination, IItemHandler destInventory, ItemStack stack) {
+    private static ItemStack putStackInInventoryAllSlots(BlockEntity source, Object destination, IItemHandler destInventory, ItemStack stack) {
         for (int slot = 0; slot < destInventory.getSlots() && !stack.isEmpty(); slot++) {
             stack = insertStack(source, destination, destInventory, stack, slot);
         }
         return stack;
     }
 
-    private static ItemStack insertStack(TileEntity source, Object destination, IItemHandler destInventory, ItemStack stack, int slot) {
+    private static ItemStack insertStack(BlockEntity source, Object destination, IItemHandler destInventory, ItemStack stack, int slot) {
         ItemStack itemstack = destInventory.getStackInSlot(slot);
         if (destInventory.insertItem(slot, stack, true).isEmpty()) {
             boolean insertedItem = false;
@@ -212,7 +210,7 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
         return stack;
     }
 
-    private static Optional<Pair<IItemHandler, Object>> getItemHandler(IHopper hopper, Direction hopperFacing) {
+    private static Optional<Pair<IItemHandler, Object>> getItemHandler(BrickHopperTileEntity hopper, Direction hopperFacing) {
         double x = hopper.getLevelX() + (double) hopperFacing.getStepX();
         double y = hopper.getLevelY() + (double) hopperFacing.getStepY();
         double z = hopper.getLevelZ() + (double) hopperFacing.getStepZ();
@@ -239,14 +237,14 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
         return true;
     }
 
-    public static Optional<Pair<IItemHandler, Object>> getItemHandler(World worldIn, double x, double y, double z, final Direction side) {
-        int i = MathHelper.floor(x);
-        int j = MathHelper.floor(y);
-        int k = MathHelper.floor(z);
+    public static Optional<Pair<IItemHandler, Object>> getItemHandler(Level worldIn, double x, double y, double z, final Direction side) {
+        int i = Mth.floor(x);
+        int j = Mth.floor(y);
+        int k = Mth.floor(z);
         BlockPos blockpos = new BlockPos(i, j, k);
         BlockState state = worldIn.getBlockState(blockpos);
-        if (state.hasTileEntity()) {
-            TileEntity tileentity = worldIn.getBlockEntity(blockpos);
+        if (state.hasBlockEntity()) {
+            BlockEntity tileentity = worldIn.getBlockEntity(blockpos);
             if (tileentity != null) {
                 return tileentity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side)
                         .map(capability -> ImmutablePair.of(capability, tileentity));
@@ -254,8 +252,8 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
         }
         //support vanilla inventory blocks without IItemHandler
         Block block = state.getBlock();
-        if (block instanceof ISidedInventoryProvider) {
-            return Optional.of(ImmutablePair.of(new SidedInvWrapper(((ISidedInventoryProvider)block).getContainer(state, worldIn, blockpos), side), state));
+        if (block instanceof WorldlyContainerHolder) {
+            return Optional.of(ImmutablePair.of(new SidedInvWrapper(((WorldlyContainerHolder)block).getContainer(state, worldIn, blockpos), side), state));
         }
         return Optional.empty();
     }
@@ -289,10 +287,9 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
      * Pull dropped EntityItems from the world above the hopper and items
      * from any inventory attached to this hopper into the hopper's inventory.
      *
-     * @param hopper the hopper in question
      * @return whether any items were successfully added to the hopper
      */
-    public boolean pullItems(IHopper hopper) {
+    public boolean pullItems() {
         return getItemHandler(this, Direction.UP)
                 .map(itemHandlerResult -> {
                     //get item from item handler
@@ -323,8 +320,8 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
                 }).orElseGet(() -> {
                     //capture item
                     if (ServerConfig.BRICK_HOPPER_PULL_ITEMS_FROM_WORLD_ENABLED.get()) {
-                        for (ItemEntity itementity : getCaptureItems(hopper)) {
-                            if (captureItem(hopper, itementity)) {
+                        for (ItemEntity itementity : getCaptureItems(this)) {
+                            if (captureItem(this, itementity)) {
                                 return true;
                             }
                         }
@@ -333,22 +330,22 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
                 });
     }
 
-    public boolean captureItem(IInventory p_200114_0_, ItemEntity p_200114_1_) {
+    public boolean captureItem(Container p_200114_0_, ItemEntity p_200114_1_) {
         boolean flag = false;
         ItemStack itemstack = p_200114_1_.getItem().copy();
         ItemStack itemstack1 = putStackInInventoryAllSlots(null, p_200114_0_, this.inventory, itemstack);
         if (itemstack1.isEmpty()) {
             flag = true;
-            p_200114_1_.remove();
+            p_200114_1_.remove(Entity.RemovalReason.DISCARDED);
         } else {
             p_200114_1_.setItem(itemstack1);
         }
         return flag;
     }
 
-    public static List<ItemEntity> getCaptureItems(IHopper p_200115_0_) {
+    public static List<ItemEntity> getCaptureItems(BrickHopperTileEntity p_200115_0_) {
         return p_200115_0_.getSuckShape().toAabbs().stream().flatMap((p_200110_1_) -> {
-            return p_200115_0_.getLevel().getEntitiesOfClass(ItemEntity.class, p_200110_1_.move(p_200115_0_.getLevelX() - 0.5D, p_200115_0_.getLevelY() - 0.5D, p_200115_0_.getLevelZ() - 0.5D), EntityPredicates.ENTITY_STILL_ALIVE).stream();
+            return p_200115_0_.getLevel().getEntitiesOfClass(ItemEntity.class, p_200110_1_.move(p_200115_0_.getLevelX() - 0.5D, p_200115_0_.getLevelY() - 0.5D, p_200115_0_.getLevelZ() - 0.5D), EntitySelector.ENTITY_STILL_ALIVE).stream();
         }).collect(Collectors.toList());
     }
 
@@ -392,7 +389,7 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
         if (ServerConfig.BRICK_HOPPER_PULL_ITEMS_FROM_WORLD_ENABLED.get()) {
             if (p_200113_1_ instanceof ItemEntity) {
                 BlockPos blockpos = this.getBlockPos();
-                if (VoxelShapes.joinIsNotEmpty(VoxelShapes.create(p_200113_1_.getBoundingBox().move(-blockpos.getX(), -blockpos.getY(), -blockpos.getZ())), this.getSuckShape(), IBooleanFunction.AND)) {
+                if (Shapes.joinIsNotEmpty(Shapes.create(p_200113_1_.getBoundingBox().move(-blockpos.getX(), -blockpos.getY(), -blockpos.getZ())), this.getSuckShape(), BooleanOp.AND)) {
                     this.updateHopper(() -> captureItem(this, (ItemEntity)p_200113_1_));
                 }
             }
@@ -401,7 +398,7 @@ public class BrickHopperTileEntity extends LockableLootTileEntity implements IHo
 
     @Override
     @Nonnull
-    protected Container createMenu(int id, @Nonnull PlayerInventory player) {
+    protected AbstractContainerMenu createMenu(int id, @Nonnull Inventory player) {
         return new BrickHopperContainer(id, player, this);
     }
 
