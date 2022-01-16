@@ -63,14 +63,12 @@ public class BrickHopperTileEntity extends RandomizableContainerBlockEntity impl
     }
 
     @Override
-    @Nonnull
-    public CompoundTag save(@Nonnull CompoundTag compound) {
-        super.save(compound);
+    public void saveAdditional(@Nonnull CompoundTag compound) {
+        super.saveAdditional(compound);
         if (!this.trySaveLootTable(compound)) {
             compound.merge(this.inventory.serializeNBT());
         }
         compound.putInt("TransferCooldown", this.transferCooldown);
-        return compound;
     }
 
     /**
