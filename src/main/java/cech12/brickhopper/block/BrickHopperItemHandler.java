@@ -1,7 +1,7 @@
 package cech12.brickhopper.block;
 
 import cech12.brickhopper.config.ServerConfig;
-import cech12.brickhopper.tileentity.BrickHopperTileEntity;
+import cech12.brickhopper.tileentity.BrickHopperBlockEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
@@ -9,9 +9,9 @@ import javax.annotation.Nonnull;
 
 public class BrickHopperItemHandler extends InvWrapper
 {
-    private final BrickHopperTileEntity hopper;
+    private final BrickHopperBlockEntity hopper;
 
-    public BrickHopperItemHandler(BrickHopperTileEntity hopper)
+    public BrickHopperItemHandler(BrickHopperBlockEntity hopper)
     {
         super(hopper);
         this.hopper = hopper;

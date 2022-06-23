@@ -1,6 +1,6 @@
 package cech12.brickhopper.tileentity;
 
-import cech12.brickhopper.api.tileentity.BrickHopperTileEntities;
+import cech12.brickhopper.api.blockentity.BrickHopperBlockEntities;
 import cech12.brickhopper.block.BrickHopperItemHandler;
 import cech12.brickhopper.config.ServerConfig;
 import cech12.brickhopper.inventory.BrickHopperContainer;
@@ -26,7 +26,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -42,14 +41,14 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class BrickHopperTileEntity extends RandomizableContainerBlockEntity implements Hopper {
+public class BrickHopperBlockEntity extends RandomizableContainerBlockEntity implements Hopper {
 
     private ItemStackHandler inventory = new ItemStackHandler(3);
     private int transferCooldown = -1;
     private long tickedGameTime;
 
-    public BrickHopperTileEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
-        super(BrickHopperTileEntities.BRICK_HOPPER, pos, state);
+    public BrickHopperBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
+        super(BrickHopperBlockEntities.BRICK_HOPPER.get(), pos, state);
     }
 
     @Override
@@ -137,10 +136,10 @@ public class BrickHopperTileEntity extends RandomizableContainerBlockEntity impl
     @Override
     @Nonnull
     protected Component getDefaultName() {
-        return new TranslatableComponent("block.brickhopper.brick_hopper");
+        return Component.translatable("block.brickhopper.brick_hopper");
     }
 
-    public static void tick(Level level, BlockPos pos, BlockState state, BrickHopperTileEntity entity) {
+    public static void tick(Level level, BlockPos pos, BlockState state, BrickHopperBlockEntity entity) {
         if (level != null && !level.isClientSide) {
             entity.transferCooldown--;
             entity.tickedGameTime = level.getGameTime();
@@ -191,12 +190,12 @@ public class BrickHopperTileEntity extends RandomizableContainerBlockEntity impl
                 insertedItem = originalSize < stack.getCount();
             }
             if (insertedItem) {
-                if (inventoryWasEmpty && destination instanceof BrickHopperTileEntity) {
-                    BrickHopperTileEntity destinationHopper = (BrickHopperTileEntity)destination;
+                if (inventoryWasEmpty && destination instanceof BrickHopperBlockEntity) {
+                    BrickHopperBlockEntity destinationHopper = (BrickHopperBlockEntity)destination;
                     if (!destinationHopper.mayTransfer()) {
                         int k = 0;
-                        if (source instanceof BrickHopperTileEntity) {
-                            if (destinationHopper.getLastUpdateTime() >= ((BrickHopperTileEntity) source).getLastUpdateTime()) {
+                        if (source instanceof BrickHopperBlockEntity) {
+                            if (destinationHopper.getLastUpdateTime() >= ((BrickHopperBlockEntity) source).getLastUpdateTime()) {
                                 k = 1;
                             }
                         }
@@ -208,7 +207,7 @@ public class BrickHopperTileEntity extends RandomizableContainerBlockEntity impl
         return stack;
     }
 
-    private static Optional<Pair<IItemHandler, Object>> getItemHandler(BrickHopperTileEntity hopper, Direction hopperFacing) {
+    private static Optional<Pair<IItemHandler, Object>> getItemHandler(BrickHopperBlockEntity hopper, Direction hopperFacing) {
         double x = hopper.getLevelX() + (double) hopperFacing.getStepX();
         double y = hopper.getLevelY() + (double) hopperFacing.getStepY();
         double z = hopper.getLevelZ() + (double) hopperFacing.getStepZ();
@@ -341,7 +340,7 @@ public class BrickHopperTileEntity extends RandomizableContainerBlockEntity impl
         return flag;
     }
 
-    public static List<ItemEntity> getCaptureItems(BrickHopperTileEntity p_200115_0_) {
+    public static List<ItemEntity> getCaptureItems(BrickHopperBlockEntity p_200115_0_) {
         return p_200115_0_.getSuckShape().toAabbs().stream().flatMap((p_200110_1_) -> {
             return p_200115_0_.getLevel().getEntitiesOfClass(ItemEntity.class, p_200110_1_.move(p_200115_0_.getLevelX() - 0.5D, p_200115_0_.getLevelY() - 0.5D, p_200115_0_.getLevelZ() - 0.5D), EntitySelector.ENTITY_STILL_ALIVE).stream();
         }).collect(Collectors.toList());
