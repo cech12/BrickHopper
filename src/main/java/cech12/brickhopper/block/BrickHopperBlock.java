@@ -84,7 +84,7 @@ public class BrickHopperBlock extends HopperBlock {
         } else {
             BlockEntity blockEntity = worldIn.getBlockEntity(pos);
             if (blockEntity instanceof BrickHopperBlockEntity) {
-                NetworkHooks.openGui((ServerPlayer) player, (BrickHopperBlockEntity) blockEntity, pos);
+                NetworkHooks.openScreen((ServerPlayer) player, (BrickHopperBlockEntity) blockEntity, pos);
                 player.awardStat(Stats.INSPECT_HOPPER);
             }
             return InteractionResult.CONSUME;

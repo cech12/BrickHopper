@@ -6,9 +6,7 @@ import cech12.brickhopper.api.inventory.BrickHopperMenuTypes;
 import cech12.brickhopper.api.item.BrickHopperItems;
 import cech12.brickhopper.client.BrickHopperScreen;
 import cech12.brickhopper.config.ServerConfig;
-import cech12.brickhopper.inventory.BrickHopperContainer;
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -34,7 +32,7 @@ public class BrickHopperMod {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         BrickHopperBlocks.BLOCKS.register(modEventBus);
         BrickHopperItems.ITEMS.register(modEventBus);
-        BrickHopperBlockEntities.BLOCK_ENTITIES.register(modEventBus);
+        BrickHopperBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
         BrickHopperMenuTypes.MENU_TYPES.register(modEventBus);
         //Config
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ServerConfig.SERVER_CONFIG);

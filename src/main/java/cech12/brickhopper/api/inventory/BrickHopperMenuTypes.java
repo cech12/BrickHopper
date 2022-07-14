@@ -11,7 +11,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class BrickHopperMenuTypes {
 
-    public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.CONTAINERS, BrickHopperMod.MOD_ID);
+    public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.MENU_TYPES, BrickHopperMod.MOD_ID);
 
     public static final RegistryObject<MenuType<BrickHopperContainer>> BRICK_HOPPER = MENU_TYPES.register("brickhopper", () -> IForgeMenuType.create((pWindowID, pInventory, pData) -> {
         BlockPos pos = pData.readBlockPos();

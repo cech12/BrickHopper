@@ -10,8 +10,8 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class BrickHopperBlockEntities {
 
-    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, BrickHopperMod.MOD_ID);
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, BrickHopperMod.MOD_ID);
 
-    public static final RegistryObject<BlockEntityType<BrickHopperBlockEntity>> BRICK_HOPPER = BLOCK_ENTITIES.register("brick_hopper", () -> BlockEntityType.Builder.of(BrickHopperBlockEntity::new, BrickHopperBlocks.BRICK_HOPPER.get()).build(null));
+    public static final RegistryObject<BlockEntityType<BrickHopperBlockEntity>> BRICK_HOPPER = BLOCK_ENTITY_TYPES.register("brick_hopper", () -> BlockEntityType.Builder.of(BrickHopperBlockEntity::new, BrickHopperBlocks.BRICK_HOPPER.get()).build(null));
 
 }
