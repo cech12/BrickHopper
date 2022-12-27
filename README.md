@@ -2,6 +2,7 @@
 
 [![Curseforge](http://cf.way2muchnoise.eu/full_442574_downloads(0D0D0D-F16436-fff-010101-fff).svg)](https://www.curseforge.com/minecraft/mc-mods/brick-hopper)
 [![Curseforge](http://cf.way2muchnoise.eu/versions/For%20MC_442574_all(0D0D0D-F16436-fff-010101).svg)](https://www.curseforge.com/minecraft/mc-mods/brick-hopper/files)
+[![Modrinth](https://modrinth-utils.vercel.app/api/badge/downloads?id=Jm0xDE8P&logo=true)](https://modrinth.com/mod/brick-hopper)
 [![CI/CD](https://github.com/cech12/BrickHopper/actions/workflows/cicd-workflow.yml/badge.svg)](https://github.com/cech12/BrickHopper/actions/workflows/cicd-workflow.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/cech12/brickhopper/badge)](https://www.codefactor.io/repository/github/cech12/brickhopper)
 [![gitlocalized ](https://gitlocalize.com/repo/8134/whole_project/badge.svg)](https://gitlocalize.com/repo/8134/?utm_source=badge)
