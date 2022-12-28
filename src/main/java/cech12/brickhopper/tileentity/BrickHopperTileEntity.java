@@ -98,7 +98,7 @@ public class BrickHopperTileEntity extends RandomizableContainerBlockEntity impl
                 this.inventory.setStackInSlot(i, itemsIn.get(i));
             }
         }
-        this.setChanged();
+        //this.setChanged(); //don't set it as changed to be compatible with Canary
     }
 
     /**
