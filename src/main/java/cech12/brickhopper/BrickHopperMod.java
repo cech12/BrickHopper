@@ -7,8 +7,10 @@ import cech12.brickhopper.api.item.BrickHopperItems;
 import cech12.brickhopper.client.BrickHopperScreen;
 import cech12.brickhopper.config.ServerConfig;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -43,6 +45,13 @@ public class BrickHopperMod {
     @SubscribeEvent
     public static void onClientRegister(FMLClientSetupEvent event) {
         MenuScreens.register(BRICK_HOPPER.get(), BrickHopperScreen::new);
+    }
+
+    @SubscribeEvent
+    public static void addItemsToTabs(CreativeModeTabEvent.BuildContents event) {
+        if (event.getTab() == CreativeModeTabs.REDSTONE_BLOCKS) {
+            event.accept(BrickHopperItems.BRICK_HOPPER);
+        }
     }
 
 }
