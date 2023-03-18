@@ -192,8 +192,7 @@ public class BrickHopperBlockEntity extends RandomizableContainerBlockEntity imp
                 insertedItem = originalSize < stack.getCount();
             }
             if (insertedItem) {
-                if (inventoryWasEmpty && destination instanceof BrickHopperBlockEntity) {
-                    BrickHopperBlockEntity destinationHopper = (BrickHopperBlockEntity)destination;
+                if (inventoryWasEmpty && destination instanceof BrickHopperBlockEntity destinationHopper) {
                     if (!destinationHopper.mayTransfer()) {
                         int k = 0;
                         if (source instanceof BrickHopperBlockEntity) {
