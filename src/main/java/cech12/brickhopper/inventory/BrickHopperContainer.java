@@ -36,7 +36,7 @@ public class BrickHopperContainer extends AbstractContainerMenu {
     }
 
     public BrickHopperContainer(int id, Inventory playerInventoryIn, BlockPos pos) {
-        this(id, playerInventoryIn, (BrickHopperBlockEntity) playerInventoryIn.player.level.getBlockEntity(pos));
+        this(id, playerInventoryIn, (BrickHopperBlockEntity) playerInventoryIn.player.level().getBlockEntity(pos));
     }
 
     /**
