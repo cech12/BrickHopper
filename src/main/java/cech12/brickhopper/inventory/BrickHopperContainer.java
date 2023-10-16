@@ -1,20 +1,20 @@
 package cech12.brickhopper.inventory;
 
 import cech12.brickhopper.api.inventory.BrickHopperMenuTypes;
-import cech12.brickhopper.tileentity.BrickHopperBlockEntity;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.BlockPos;
 
 import javax.annotation.Nonnull;
 
 public class BrickHopperContainer extends AbstractContainerMenu {
-    private final BrickHopperBlockEntity hopper;
+    private final Container hopper;
 
-    public BrickHopperContainer(int id, Inventory playerInventory, BrickHopperBlockEntity inventory) {
+    public BrickHopperContainer(int id, Inventory playerInventory, Container inventory) {
         super(BrickHopperMenuTypes.BRICK_HOPPER.get(), id);
         this.hopper = inventory;
         checkContainerSize(inventory, 3);
@@ -35,8 +35,8 @@ public class BrickHopperContainer extends AbstractContainerMenu {
         }
     }
 
-    public BrickHopperContainer(int id, Inventory playerInventoryIn, BlockPos pos) {
-        this(id, playerInventoryIn, (BrickHopperBlockEntity) playerInventoryIn.player.level().getBlockEntity(pos));
+    public BrickHopperContainer(int id, Inventory playerInventoryIn) {
+        this(id, playerInventoryIn, new SimpleContainer(3));
     }
 
     /**
