@@ -1,5 +1,6 @@
 package de.cech12.brickhopper.block;
 
+import de.cech12.brickhopper.Constants;
 import de.cech12.brickhopper.blockentity.BrickHopperBlockEntity;
 import de.cech12.brickhopper.platform.Services;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -53,7 +54,7 @@ public class BrickHopperBlock extends HopperBlock {
     @Override
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@Nonnull Level level, @Nonnull BlockState state, @Nonnull BlockEntityType<T> entityType) {
-        return createTickerHelper(entityType, Services.REGISTRY.getBlockEntityType(), Services.REGISTRY.getBlockTicker());
+        return createTickerHelper(entityType, Constants.BRICK_HOPPER_BLOCK_ENTITY_TYPE.get(), Services.REGISTRY.getBlockTicker());
     }
 
     /**
@@ -100,8 +101,8 @@ public class BrickHopperBlock extends HopperBlock {
     @Override
     public void entityInside(@Nonnull BlockState state, Level worldIn, @Nonnull BlockPos pos, @Nonnull Entity entityIn) {
         BlockEntity blockEntity = worldIn.getBlockEntity(pos);
-        if (blockEntity instanceof BrickHopperBlockEntity) {
-            Services.REGISTRY.onEntityCollision((BrickHopperBlockEntity)blockEntity, entityIn);
+        if (blockEntity instanceof BrickHopperBlockEntity brickHopperBlockEntity) {
+            brickHopperBlockEntity.onEntityCollision(entityIn);
         }
     }
 

@@ -1,7 +1,7 @@
 package de.cech12.brickhopper.block;
 
+import de.cech12.brickhopper.blockentity.BrickHopperBlockEntity;
 import de.cech12.brickhopper.platform.Services;
-import de.cech12.brickhopper.blockentity.NeoForgeBrickHopperBlockEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
 
@@ -9,9 +9,9 @@ import javax.annotation.Nonnull;
 
 public class NeoForgeBrickHopperItemHandler extends InvWrapper
 {
-    private final NeoForgeBrickHopperBlockEntity hopper;
+    private final BrickHopperBlockEntity hopper;
 
-    public NeoForgeBrickHopperItemHandler(NeoForgeBrickHopperBlockEntity hopper) {
+    public NeoForgeBrickHopperItemHandler(BrickHopperBlockEntity hopper) {
         super(hopper);
         this.hopper = hopper;
     }

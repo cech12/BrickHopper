@@ -9,10 +9,15 @@
 [![License](https://img.shields.io/github/license/cech12/BrickHopper)](http://opensource.org/licenses/MIT)
 [![](https://img.shields.io/discord/752506676719910963.svg?style=flat&color=informational&logo=discord&label=Discord)](https://discord.gg/gRUFH5t)
 
-This is a **Minecraft Forge** mod and adds a **Brick Hopper** to the game.
+This is a Minecraft mod that adds a **Brick Hopper** to the game. (Forge, NeoForge, Fabric, Quilt)
 
 ![Brick Hopper](material/brick_hopper.png)
 
 It acts like a vanilla hopper but is a bit slower than a vanilla hopper (12 ticks instead of 8, configurable) and has only three slots.
+
+The Fabric / Quilt version needs the following mods:
+
+- Fabric API ([Github](https://github.com/FabricMC/fabric), [Curseforge](https://www.curseforge.com/minecraft/mc-mods/fabric-api), [Modrinth](https://modrinth.com/mod/fabric-api))
+- Cloth Config API ([Github](https://github.com/shedaniel/cloth-config), [Curseforge](https://www.curseforge.com/minecraft/mc-mods/cloth-config), [Modrinth](https://modrinth.com/mod/cloth-config))
 
 For more information check out the **Wiki**: https://github.com/cech12/BrickHopper/wiki

@@ -1,6 +1,6 @@
 package de.cech12.brickhopper.inventory;
 
-import de.cech12.brickhopper.platform.Services;
+import de.cech12.brickhopper.Constants;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
@@ -15,7 +15,7 @@ public class BrickHopperContainer extends AbstractContainerMenu {
     private final Container hopper;
 
     public BrickHopperContainer(int id, Inventory playerInventory, Container inventory) {
-        super(Services.REGISTRY.getMenuType(), id);
+        super(Constants.BRICK_HOPPER_MENU_TYPE.get(), id);
         this.hopper = inventory;
         AbstractContainerMenu.checkContainerSize(inventory, 3);
         inventory.startOpen(playerInventory.player);

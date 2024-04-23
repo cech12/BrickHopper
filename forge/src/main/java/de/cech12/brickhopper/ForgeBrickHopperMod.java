@@ -13,13 +13,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-import static de.cech12.brickhopper.ForgeBrickHopperMod.MOD_ID;
-
-@Mod(MOD_ID)
-@Mod.EventBusSubscriber(modid= MOD_ID, bus= Mod.EventBusSubscriber.Bus.MOD)
+@Mod(Constants.MOD_ID)
+@Mod.EventBusSubscriber(modid= Constants.MOD_ID, bus= Mod.EventBusSubscriber.Bus.MOD)
 public class ForgeBrickHopperMod {
-
-    public static final String MOD_ID = "brickhopper";
 
     public ForgeBrickHopperMod() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -33,13 +29,13 @@ public class ForgeBrickHopperMod {
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void onClientRegister(FMLClientSetupEvent event) {
-        MenuScreens.register(ForgeRegistryHelper.BRICK_HOPPER_MENU_TYPE.get(), BrickHopperScreen::new);
+        MenuScreens.register(Constants.BRICK_HOPPER_MENU_TYPE.get(), BrickHopperScreen::new);
     }
 
     @SubscribeEvent
     public static void addItemsToTabs(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
-            event.accept(ForgeRegistryHelper.BRICK_HOPPER_ITEM);
+            event.accept(Constants.BRICK_HOPPER_ITEM);
         }
     }
 

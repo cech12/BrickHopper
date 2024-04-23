@@ -1,7 +1,9 @@
 package de.cech12.brickhopper.blockentity;
 
+import de.cech12.brickhopper.Constants;
 import de.cech12.brickhopper.inventory.BrickHopperContainer;
 import de.cech12.brickhopper.platform.Services;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -19,7 +21,7 @@ public abstract class BrickHopperBlockEntity extends RandomizableContainerBlockE
     protected long tickedGameTime;
 
     public BrickHopperBlockEntity(BlockPos pos, BlockState state) {
-        super(Services.REGISTRY.getBlockEntityType(), pos, state);
+        super(Constants.BRICK_HOPPER_BLOCK_ENTITY_TYPE.get(), pos, state);
     }
 
     @Override
@@ -85,4 +87,7 @@ public abstract class BrickHopperBlockEntity extends RandomizableContainerBlockE
     protected long getLastUpdateTime() {
         return this.tickedGameTime;
     }
+
+    public abstract void onEntityCollision(Entity entity);
+
 }

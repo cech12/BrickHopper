@@ -1,6 +1,5 @@
 package de.cech12.brickhopper.blockentity;
 
-import de.cech12.brickhopper.block.NeoForgeBrickHopperItemHandler;
 import de.cech12.brickhopper.platform.Services;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.Block;
@@ -20,7 +19,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -122,12 +120,6 @@ public class NeoForgeBrickHopperBlockEntity extends BrickHopperBlockEntity {
         this.unpackLootTable(null);
         this.inventory.setStackInSlot(index, stack);
         this.setChanged();
-    }
-
-    @Override
-    @Nonnull
-    protected Component getDefaultName() {
-        return Component.translatable("block.brickhopper.brick_hopper");
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, BrickHopperBlockEntity entity) {
@@ -334,6 +326,7 @@ public class NeoForgeBrickHopperBlockEntity extends BrickHopperBlockEntity {
         }).collect(Collectors.toList());
     }
 
+    @Override
     public void onEntityCollision(Entity p_200113_1_) {
         if (Services.CONFIG.isPullItemsFromWorldEnabled()) {
             if (p_200113_1_ instanceof ItemEntity) {

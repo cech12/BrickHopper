@@ -30,18 +30,18 @@ public class NeoForgeBrickHopperMod {
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void onClientRegister(FMLClientSetupEvent event) {
-        MenuScreens.register(NeoForgeRegistryHelper.BRICK_HOPPER_MENU_TYPE.get(), BrickHopperScreen::new);
+        MenuScreens.register(Constants.BRICK_HOPPER_MENU_TYPE.get(), BrickHopperScreen::new);
     }
 
     @SubscribeEvent
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, NeoForgeRegistryHelper.BRICK_HOPPER_BLOCK_ENTITY_TYPE.get(), (blockEntity, side) -> new NeoForgeBrickHopperItemHandler(blockEntity));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, Constants.BRICK_HOPPER_BLOCK_ENTITY_TYPE.get(), (blockEntity, side) -> new NeoForgeBrickHopperItemHandler(blockEntity));
     }
 
     @SubscribeEvent
     public static void addItemsToTabs(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
-            event.accept(NeoForgeRegistryHelper.BRICK_HOPPER_ITEM);
+            event.accept(Constants.BRICK_HOPPER_ITEM.get());
         }
     }
 
