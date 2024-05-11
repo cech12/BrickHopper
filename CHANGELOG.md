@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Forge Recommended Versioning](https://mcforge.readthedocs.io/en/latest/conventions/versioning/).
 
+## [1.20.4-2.2.1.0] - 2024-05-11
+### Added
+- better compatibility with mods that do not support ItemHandlers (Forge & NeoForge)
+
+### Fixed
+- Brick Hopper recipe advancement triggered with first inventory change (Fabric/Quilt)
+
 ## [1.20.4-2.2.0.1] - 2024-04-24
 ### Fixed
 - fixed Brick Hopper crafting recipe (Fabric, Quilt)

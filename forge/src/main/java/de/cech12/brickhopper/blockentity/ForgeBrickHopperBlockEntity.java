@@ -7,6 +7,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
+import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.WorldlyContainerHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
@@ -25,6 +27,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -196,8 +199,17 @@ public class ForgeBrickHopperBlockEntity extends BrickHopperBlockEntity {
         if (state.hasBlockEntity()) {
             BlockEntity blockEntity = level.getBlockEntity(blockpos);
             if (blockEntity != null) {
-                return blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, side)
-                        .map(capability -> ImmutablePair.of(capability, blockEntity));
+                var handlerOptional = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, side);
+                if (handlerOptional.isPresent()) {
+                    return handlerOptional.map(capability -> ImmutablePair.of(capability, blockEntity));
+                }
+                //support vanilla inventory block entities without IItemHandler
+                if (blockEntity instanceof WorldlyContainer container) {
+                    return Optional.of(ImmutablePair.of(new SidedInvWrapper(container, side), state));
+                }
+                if (blockEntity instanceof Container container) {
+                    return Optional.of(ImmutablePair.of(new InvWrapper(container), state));
+                }
             }
         }
         //support vanilla inventory blocks without IItemHandler
