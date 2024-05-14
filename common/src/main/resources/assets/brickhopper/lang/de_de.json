@@ -1,23 +1,5 @@
 {
   "block.brickhopper.brick_hopper": "Ziegeltrichter",
   "block.brickhopper.brick_hopper.desc.cannotAbsorbItemsFromWorld": "Er kann keine über ihm liegende Gegenstände aufnehmen.",
-  "block.brickhopper.brick_hopper.desc.cannotAbsorbItemsFromInventories": "Er kann keine Gegenstände aus Inventaren herausziehen.",
-
-  "text.autoconfig.brickhopper.title": "Brick Hopper Settings",
-
-  "text.autoconfig.brickhopper.option.COOLDOWN": "Brick Hopper Cooldown",
-  "text.autoconfig.brickhopper.option.COOLDOWN.@Tooltip[0]": "§6§lBrick Hopper Cooldown",
-  "text.autoconfig.brickhopper.option.COOLDOWN.@Tooltip[1]": "Time (ticks) that passes between two Brick Hopper operations.",
-  "text.autoconfig.brickhopper.option.COOLDOWN.@Tooltip[2]": "§7§oDefault: 12",
-  "text.autoconfig.brickhopper.option.COOLDOWN.@Tooltip[3]": "§7§o(Vanilla Hopper: 8)",
-
-  "text.autoconfig.brickhopper.option.PULL_ITEMS_FROM_WORLD_ENABLED": "Brick Hopper pulls from world",
-  "text.autoconfig.brickhopper.option.PULL_ITEMS_FROM_WORLD_ENABLED.@Tooltip[0]": "§6§lBrick Hopper pulls items from world",
-  "text.autoconfig.brickhopper.option.PULL_ITEMS_FROM_WORLD_ENABLED.@Tooltip[1]": "Whether or not the brick hopper can pull item entities lying above it.",
-  "text.autoconfig.brickhopper.option.PULL_ITEMS_FROM_WORLD_ENABLED.@Tooltip[2]": "§7§oDefault: true",
-
-  "text.autoconfig.brickhopper.option.PULL_ITEMS_FROM_INVENTORIES_ENABLED": "Brick Hopper pulls from inventories",
-  "text.autoconfig.brickhopper.option.PULL_ITEMS_FROM_INVENTORIES_ENABLED.@Tooltip[0]": "§6§lBrick Hopper pulls items from inventories",
-  "text.autoconfig.brickhopper.option.PULL_ITEMS_FROM_INVENTORIES_ENABLED.@Tooltip[1]": "Whether or not the brick hopper can pull items from inventories above it.",
-  "text.autoconfig.brickhopper.option.PULL_ITEMS_FROM_INVENTORIES_ENABLED.@Tooltip[2]": "§7§oDefault: true"
+  "block.brickhopper.brick_hopper.desc.cannotAbsorbItemsFromInventories": "Er kann keine Gegenstände aus Inventaren herausziehen."
 }

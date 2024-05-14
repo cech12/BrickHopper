@@ -3,9 +3,9 @@ package de.cech12.brickhopper.platform;
 import de.cech12.brickhopper.Constants;
 import de.cech12.brickhopper.block.BrickHopperBlock;
 import de.cech12.brickhopper.blockentity.BrickHopperBlockEntity;
+import de.cech12.brickhopper.blockentity.NeoForgeBrickHopperBlockEntity;
 import de.cech12.brickhopper.inventory.BrickHopperContainer;
 import de.cech12.brickhopper.platform.services.IRegistryHelper;
-import de.cech12.brickhopper.blockentity.NeoForgeBrickHopperBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.inventory.MenuType;
@@ -13,7 +13,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,8 +21,7 @@ import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 public class NeoForgeRegistryHelper implements IRegistryHelper {
 
@@ -45,12 +43,7 @@ public class NeoForgeRegistryHelper implements IRegistryHelper {
     }
 
     @Override
-    public BlockEntityTicker<BrickHopperBlockEntity> getBlockTicker() {
-        return NeoForgeBrickHopperBlockEntity::tick;
-    }
-
-    @Override
-    public BrickHopperBlockEntity getNewBlockEntity(@Nonnull BlockPos pos, @Nonnull BlockState state) {
+    public BrickHopperBlockEntity getNewBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state) {
         return new NeoForgeBrickHopperBlockEntity(pos, state);
     }
 

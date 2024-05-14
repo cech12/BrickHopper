@@ -8,13 +8,13 @@
   ],
   "key": {
     "B": {
-      "item": "minecraft:brick"
+      "tag": "c:bricks/normal"
     },
     "C": {
-      "tag": "c:wooden_chests"
+      "tag": "c:chests/wooden"
     }
   },
   "result": {
-    "item": "brickhopper:brick_hopper"
+    "id": "brickhopper:brick_hopper"
   }
 }

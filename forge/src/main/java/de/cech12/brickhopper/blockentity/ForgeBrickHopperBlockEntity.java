@@ -1,29 +1,23 @@
 package de.cech12.brickhopper.blockentity;
 
 import de.cech12.brickhopper.block.ForgeBrickHopperItemHandler;
-import de.cech12.brickhopper.platform.Services;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.WorldlyContainerHolder;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.shapes.BooleanOp;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
@@ -31,12 +25,10 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class ForgeBrickHopperBlockEntity extends BrickHopperBlockEntity {
 
@@ -47,8 +39,8 @@ public class ForgeBrickHopperBlockEntity extends BrickHopperBlockEntity {
     }
 
     @Override
-    public void load(@Nonnull CompoundTag nbt) {
-        super.load(nbt);
+    protected void loadAdditional(@NotNull CompoundTag nbt, @NotNull HolderLookup.Provider provider) {
+        super.loadAdditional(nbt, provider);
         inventory = new ItemStackHandler(3);
         if (!this.tryLoadLootTable(nbt)) {
             this.inventory.deserializeNBT(nbt);
@@ -56,10 +48,10 @@ public class ForgeBrickHopperBlockEntity extends BrickHopperBlockEntity {
     }
 
     @Override
-    public void saveAdditional(@Nonnull CompoundTag compound) {
-        super.saveAdditional(compound);
+    public void saveAdditional(@NotNull CompoundTag compound, @NotNull HolderLookup.Provider provider) {
+        super.saveAdditional(compound, provider);
         if (!this.trySaveLootTable(compound)) {
-            compound.merge(this.inventory.serializeNBT());
+            compound.merge(this.inventory.serializeNBT(provider));
         }
     }
 
@@ -72,7 +64,7 @@ public class ForgeBrickHopperBlockEntity extends BrickHopperBlockEntity {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     protected NonNullList<ItemStack> getItems() {
         NonNullList<ItemStack> list = NonNullList.withSize(3, ItemStack.EMPTY);
         for (int i = 0; i < 3; i++) {
@@ -82,7 +74,7 @@ public class ForgeBrickHopperBlockEntity extends BrickHopperBlockEntity {
     }
 
     @Override
-    protected void setItems(@Nonnull NonNullList<ItemStack> itemsIn) {
+    protected void setItems(@NotNull NonNullList<ItemStack> itemsIn) {
         if (itemsIn.size() == 3) {
             for (int i = 0; i < 3; i++) {
                 this.inventory.setStackInSlot(i, itemsIn.get(i));
@@ -95,7 +87,7 @@ public class ForgeBrickHopperBlockEntity extends BrickHopperBlockEntity {
      * Removes up to a specified number of items from an inventory slot and returns them in a new stack.
      */
     @Override
-    @Nonnull
+    @NotNull
     public ItemStack removeItem(int index, int count) {
         this.unpackLootTable(null);
         ItemStack stack = this.inventory.extractItem(index, count, false);
@@ -107,7 +99,7 @@ public class ForgeBrickHopperBlockEntity extends BrickHopperBlockEntity {
      * Removes a stack from the given slot and returns it.
      */
     @Override
-    @Nonnull
+    @NotNull
     public ItemStack removeItemNoUpdate(int index) {
         this.unpackLootTable(null);
         ItemStack stack = this.inventory.getStackInSlot(index);
@@ -120,81 +112,42 @@ public class ForgeBrickHopperBlockEntity extends BrickHopperBlockEntity {
      * Sets the given item stack to the specified slot in the inventory (can be crafting or armor sections).
      */
     @Override
-    public void setItem(int index, @Nonnull ItemStack stack) {
+    public void setItem(int index, @NotNull ItemStack stack) {
         this.unpackLootTable(null);
         this.inventory.setStackInSlot(index, stack);
         this.setChanged();
     }
 
-    public static void tick(Level level, BlockPos pos, BlockState state, BrickHopperBlockEntity entity) {
-        if (level != null && !level.isClientSide) {
-            entity.transferCooldown--;
-            entity.tickedGameTime = level.getGameTime();
-            if (!entity.isOnTransferCooldown()) {
-                entity.setTransferCooldown(0);
-                if (entity instanceof ForgeBrickHopperBlockEntity blockEntity) {
-                    blockEntity.updateHopper(() -> pullItems(blockEntity));
-                }
-            }
-        }
+    @Override
+    @NotNull
+    protected IItemHandler createUnSidedHandler() {
+        return new ForgeBrickHopperItemHandler(this);
     }
 
-    private void updateHopper(Supplier<Boolean> p_200109_1_) {
-        if (this.level != null && !this.level.isClientSide) {
-            if (!this.isOnTransferCooldown() && this.getBlockState().getValue(HopperBlock.ENABLED)) {
-                boolean flag = false;
-                if (!this.isEmpty()) {
-                    flag = this.transferItemsOut();
-                }
-                if (isNotFull(this.inventory)) {
-                    flag |= p_200109_1_.get();
-                }
-                if (flag) {
-                    this.setTransferCooldown(Services.CONFIG.getCooldown());
-                    this.setChanged();
-                }
-            }
-        }
-    }
-
-    private static ItemStack putStackInInventoryAllSlots(BlockEntity source, Object destination, IItemHandler destInventory, ItemStack stack) {
+    @Override
+    protected ItemStack putStackInInventoryAllSlots(BlockEntity source, Object destination, Object destInventoryObj, ItemStack stack) {
+        IItemHandler destInventory = (IItemHandler) destInventoryObj;
         for (int slot = 0; slot < destInventory.getSlots() && !stack.isEmpty(); slot++) {
             stack = insertStack(source, destination, destInventory, stack, slot);
         }
         return stack;
     }
 
-    private static ItemStack insertStack(BlockEntity source, Object destination, IItemHandler destInventory, ItemStack stack, int slot) {
+    private ItemStack insertStack(BlockEntity source, Object destination, IItemHandler destInventory, ItemStack stack, int slot) {
         ItemStack result = stack;
         if (!destInventory.insertItem(slot, stack, true).equals(stack)) {
             boolean inventoryWasEmpty = isEmpty(destInventory);
             result = destInventory.insertItem(slot, stack, false);
-            if (result.getCount() < stack.getCount() && inventoryWasEmpty
-                    && destination instanceof ForgeBrickHopperBlockEntity destinationHopper
-                    && !destinationHopper.mayTransfer()
-            ) {
-                int k = 0;
-                if (source instanceof ForgeBrickHopperBlockEntity && destinationHopper.getLastUpdateTime() >= ((ForgeBrickHopperBlockEntity) source).getLastUpdateTime()) {
-                    k = 1;
-                }
-                destinationHopper.setTransferCooldown(Services.CONFIG.getCooldown() - k);
+            if (result.getCount() < stack.getCount()) {
+                updateCooldown(inventoryWasEmpty, source, destination);
             }
         }
         return result;
     }
 
-    private static Optional<Pair<IItemHandler, Object>> getItemHandler(ForgeBrickHopperBlockEntity hopper, Direction hopperFacing) {
-        double x = hopper.getLevelX() + (double) hopperFacing.getStepX();
-        double y = hopper.getLevelY() + (double) hopperFacing.getStepY();
-        double z = hopper.getLevelZ() + (double) hopperFacing.getStepZ();
-        return getItemHandler(hopper.getLevel(), x, y, z, hopperFacing.getOpposite());
-    }
-
-    private static Optional<Pair<IItemHandler, Object>> getItemHandler(Level level, double x, double y, double z, final Direction side) {
-        int i = Mth.floor(x);
-        int j = Mth.floor(y);
-        int k = Mth.floor(z);
-        BlockPos blockpos = new BlockPos(i, j, k);
+    @Override
+    protected Optional<Pair<Object, Object>> getItemHandler(Level level, double x, double y, double z, final Direction side) {
+        BlockPos blockpos = BlockPos.containing(x, y, z);
         BlockState state = level.getBlockState(blockpos);
         if (state.hasBlockEntity()) {
             BlockEntity blockEntity = level.getBlockEntity(blockpos);
@@ -218,18 +171,27 @@ public class ForgeBrickHopperBlockEntity extends BrickHopperBlockEntity {
             return Optional.of(ImmutablePair.of(new SidedInvWrapper(((WorldlyContainerHolder)block).getContainer(state, level, blockpos), side), state));
         }
         //get entities with item handlers
-        List<Entity> list = level.getEntities((Entity)null,
-                new AABB(x - 0.5D, y - 0.5D, z - 0.5D, x + 0.5D, y + 0.5D, z + 0.5D),
-                (entity) -> !(entity instanceof LivingEntity) && entity.isAlive() && entity.getCapability(ForgeCapabilities.ITEM_HANDLER, side).isPresent());
+        List<Entity> list = getAllAliveEntitiesAt(level, x, y, z,
+                entity -> entity instanceof Container || !(entity instanceof LivingEntity) && entity.getCapability(ForgeCapabilities.ITEM_HANDLER, side).isPresent());
         if (!list.isEmpty()) {
             Entity entity = list.get(level.random.nextInt(list.size()));
-            return entity.getCapability(ForgeCapabilities.ITEM_HANDLER, side)
-                    .map(capability -> ImmutablePair.of(capability, entity));
+            LazyOptional<IItemHandler> cap = entity.getCapability(ForgeCapabilities.ITEM_HANDLER, side);
+            if (cap.isPresent()) {
+                return cap.map(capability -> ImmutablePair.of(capability, entity));
+            }
+            if (entity instanceof WorldlyContainer container) {
+                return Optional.of(ImmutablePair.of(new SidedInvWrapper(container, side), entity));
+            }
+            if (entity instanceof Container containerEntity) {
+                return Optional.of(ImmutablePair.of(new InvWrapper((containerEntity)), entity));
+            }
         }
         return Optional.empty();
     }
 
-    private static boolean isNotFull(IItemHandler itemHandler) {
+    @Override
+    protected boolean isNotFull(Object itemHandlerObj) {
+        IItemHandler itemHandler = (IItemHandler) itemHandlerObj;
         for (int slot = 0; slot < itemHandler.getSlots(); slot++) {
             ItemStack stackInSlot = itemHandler.getStackInSlot(slot);
             if (stackInSlot.isEmpty() || stackInSlot.getCount() < itemHandler.getSlotLimit(slot)) {
@@ -239,7 +201,7 @@ public class ForgeBrickHopperBlockEntity extends BrickHopperBlockEntity {
         return false;
     }
 
-    private static boolean isEmpty(IItemHandler itemHandler) {
+    private boolean isEmpty(IItemHandler itemHandler) {
         for (int slot = 0; slot < itemHandler.getSlots(); slot++) {
             ItemStack stackInSlot = itemHandler.getStackInSlot(slot);
             if (stackInSlot.getCount() > 0) {
@@ -249,114 +211,35 @@ public class ForgeBrickHopperBlockEntity extends BrickHopperBlockEntity {
         return true;
     }
 
-    private boolean transferItemsOut() {
-        Direction hopperFacing = this.getBlockState().getValue(HopperBlock.FACING);
-        return getItemHandler(this, hopperFacing)
-                .map(destinationResult -> {
-                    IItemHandler itemHandler = destinationResult.getKey();
-                    Object destination = destinationResult.getValue();
-                    if (isNotFull(itemHandler)) {
-                        for (int i = 0; i < this.getContainerSize(); ++i) {
-                            if (!this.getItem(i).isEmpty()) {
-                                ItemStack originalSlotContents = this.getItem(i).copy();
-                                ItemStack insertStack = this.removeItem(i, 1);
-                                ItemStack remainder = putStackInInventoryAllSlots(this, destination, itemHandler, insertStack);
-                                if (remainder.isEmpty()) {
-                                    return true;
-                                }
-                                this.setItem(i, originalSlotContents);
-                            }
-                        }
-
-                    }
-                    return false;
-                })
-                .orElse(false);
-    }
-
-    /**
-     * Pull dropped EntityItems from the world above the hopper and items
-     * from any inventory attached to this hopper into the hopper's inventory.
-     *
-     * @param hopper the hopper in question
-     * @return whether any items were successfully added to the hopper
-     */
-    private static boolean pullItems(ForgeBrickHopperBlockEntity hopper) {
-        return getItemHandler(hopper, Direction.UP)
-                .map(itemHandlerResult -> {
-                    //get item from item handler
-                    if (Services.CONFIG.isPullItemsFromInventoriesEnabled()) {
-                        IItemHandler handler = itemHandlerResult.getKey();
-                        for (int i = 0; i < handler.getSlots(); i++) {
-                            ItemStack extractItem = handler.extractItem(i, 1, true);
-                            if (!extractItem.isEmpty()) {
-                                for (int j = 0; j < hopper.getContainerSize(); j++) {
-                                    ItemStack destStack = hopper.getItem(j);
-                                    if (hopper.canPlaceItem(j, extractItem) && (destStack.isEmpty() || destStack.getCount() < destStack.getMaxStackSize()
-                                            && destStack.getCount() < hopper.getMaxStackSize() && ItemHandlerHelper.canItemStacksStack(extractItem, destStack))) {
-                                        extractItem = handler.extractItem(i, 1, false);
-                                        if (destStack.isEmpty()) {
-                                            hopper.setItem(j, extractItem);
-                                        } else {
-                                            destStack.grow(1);
-                                            hopper.setItem(j, destStack);
-                                        }
-                                        hopper.setChanged();
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    return false;
-                }).orElseGet(() -> {
-                    //capture item
-                    if (Services.CONFIG.isPullItemsFromWorldEnabled()) {
-                        for (ItemEntity itementity : getCaptureItems(hopper)) {
-                            if (captureItem(hopper, itementity)) {
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
-                });
-    }
-
-    private static boolean captureItem(ForgeBrickHopperBlockEntity hopper, ItemEntity p_200114_1_) {
-        boolean flag = false;
-        ItemStack itemstack = p_200114_1_.getItem().copy();
-        ItemStack itemstack1 = putStackInInventoryAllSlots(null, hopper, hopper.inventory, itemstack);
-        if (itemstack1.isEmpty()) {
-            flag = true;
-            p_200114_1_.remove(Entity.RemovalReason.DISCARDED);
-        } else {
-            p_200114_1_.setItem(itemstack1);
-        }
-        return flag;
-    }
-
-    private static List<ItemEntity> getCaptureItems(ForgeBrickHopperBlockEntity p_200115_0_) {
-        return p_200115_0_.getSuckShape().toAabbs().stream().flatMap((p_200110_1_) -> {
-            return p_200115_0_.getLevel().getEntitiesOfClass(ItemEntity.class, p_200110_1_.move(p_200115_0_.getLevelX() - 0.5D, p_200115_0_.getLevelY() - 0.5D, p_200115_0_.getLevelZ() - 0.5D), EntitySelector.ENTITY_STILL_ALIVE).stream();
-        }).collect(Collectors.toList());
-    }
-
     @Override
-    public void onEntityCollision(Entity p_200113_1_) {
-        if (Services.CONFIG.isPullItemsFromWorldEnabled()) {
-            if (p_200113_1_ instanceof ItemEntity) {
-                BlockPos blockpos = this.getBlockPos();
-                if (Shapes.joinIsNotEmpty(Shapes.create(p_200113_1_.getBoundingBox().move((-blockpos.getX()), (-blockpos.getY()), (-blockpos.getZ()))), this.getSuckShape(), BooleanOp.AND)) {
-                    this.updateHopper(() -> captureItem(this, (ItemEntity)p_200113_1_));
+    protected boolean pullItemsFromItemHandler(Object itemHandlerObj) {
+        IItemHandler handler = (IItemHandler) itemHandlerObj;
+        for (int i = 0; i < handler.getSlots(); i++) {
+            ItemStack extractItem = handler.extractItem(i, 1, true);
+            if (!extractItem.isEmpty()) {
+                for (int j = 0; j < this.getContainerSize(); j++) {
+                    ItemStack destStack = this.getItem(j);
+                    if (this.canPlaceItem(j, extractItem) && (destStack.isEmpty() || destStack.getCount() < destStack.getMaxStackSize()
+                            && destStack.getCount() < this.getMaxStackSize() && ItemHandlerHelper.canItemStacksStack(extractItem, destStack))) {
+                        extractItem = handler.extractItem(i, 1, false);
+                        if (destStack.isEmpty()) {
+                            this.setItem(j, extractItem);
+                        } else {
+                            destStack.grow(1);
+                            this.setItem(j, destStack);
+                        }
+                        this.setChanged();
+                        return true;
+                    }
                 }
             }
         }
+        return false;
     }
 
     @Override
-    @Nonnull
-    protected IItemHandler createUnSidedHandler() {
-        return new ForgeBrickHopperItemHandler(this);
+    protected Object getOwnItemHandler() {
+        return this.inventory;
     }
 
 }

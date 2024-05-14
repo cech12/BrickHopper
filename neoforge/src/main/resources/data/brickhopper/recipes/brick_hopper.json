@@ -8,13 +8,13 @@
   ],
   "key": {
     "B": {
-      "tag": "forge:ingots/brick"
+      "tag": "c:bricks/normal"
     },
     "C": {
-      "tag": "forge:chests/wooden"
+      "tag": "c:chests/wooden"
     }
   },
   "result": {
-    "item": "brickhopper:brick_hopper"
+    "id": "brickhopper:brick_hopper"
   }
 }

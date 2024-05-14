@@ -1,6 +1,5 @@
 package de.cech12.brickhopper.blockentity;
 
-import de.cech12.brickhopper.platform.Services;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -8,39 +7,31 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.entity.vehicle.ContainerEntity;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.HopperBlock;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.WorldlyContainerHolder;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
-import net.minecraft.world.entity.EntitySelector;
-import net.minecraft.core.NonNullList;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.shapes.BooleanOp;
-import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.WorldlyContainerHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.vehicle.ContainerEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class FabricBrickHopperBlockEntity extends BrickHopperBlockEntity {
 
-    InventoryStorage inventory = InventoryStorage.of(this, null);
+    private final InventoryStorage inventory = InventoryStorage.of(this, null);
     private NonNullList<ItemStack> items;
 
     public FabricBrickHopperBlockEntity(BlockPos pos, BlockState state) {
@@ -49,19 +40,19 @@ public class FabricBrickHopperBlockEntity extends BrickHopperBlockEntity {
     }
 
     @Override
-    public void load(@Nonnull CompoundTag compoundTag) {
-        super.load(compoundTag);
+    protected void loadAdditional(@NotNull CompoundTag compoundTag, @NotNull HolderLookup.Provider provider) {
+        super.loadAdditional(compoundTag, provider);
         this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
         if (!this.tryLoadLootTable(compoundTag)) {
-            ContainerHelper.loadAllItems(compoundTag, this.items);
+            ContainerHelper.loadAllItems(compoundTag, this.items, provider);
         }
     }
 
     @Override
-    public void saveAdditional(@Nonnull CompoundTag compoundTag) {
-        super.saveAdditional(compoundTag);
+    public void saveAdditional(@NotNull CompoundTag compoundTag, @NotNull HolderLookup.Provider provider) {
+        super.saveAdditional(compoundTag, provider);
         if (!this.trySaveLootTable(compoundTag)) {
-            ContainerHelper.saveAllItems(compoundTag, this.items);
+            ContainerHelper.saveAllItems(compoundTag, this.items, provider);
         }
     }
 
@@ -74,13 +65,13 @@ public class FabricBrickHopperBlockEntity extends BrickHopperBlockEntity {
     }
 
     @Override
-    @Nonnull
+    @NotNull
     protected NonNullList<ItemStack> getItems() {
         return this.items;
     }
 
     @Override
-    protected void setItems(@Nonnull NonNullList<ItemStack> nonNullList) {
+    protected void setItems(@NotNull NonNullList<ItemStack> nonNullList) {
         this.items = nonNullList;
     }
 
@@ -88,7 +79,7 @@ public class FabricBrickHopperBlockEntity extends BrickHopperBlockEntity {
      * Removes up to a specified number of items from an inventory slot and returns them in a new stack.
      */
     @Override
-    @Nonnull
+    @NotNull
     public ItemStack removeItem(int index, int count) {
         this.unpackLootTable(null);
         ItemStack stack = ContainerHelper.removeItem(this.getItems(), index, count);
@@ -100,7 +91,7 @@ public class FabricBrickHopperBlockEntity extends BrickHopperBlockEntity {
      * Removes a stack from the given slot and returns it.
      */
     @Override
-    @Nonnull
+    @NotNull
     public ItemStack removeItemNoUpdate(int index) {
         this.unpackLootTable(null);
         ItemStack stack = ContainerHelper.takeItem(this.getItems(), index);
@@ -112,7 +103,7 @@ public class FabricBrickHopperBlockEntity extends BrickHopperBlockEntity {
      * Sets the given item stack to the specified slot in the inventory (can be crafting or armor sections).
      */
     @Override
-    public void setItem(int index, @Nonnull ItemStack itemStack) {
+    public void setItem(int index, @NotNull ItemStack itemStack) {
         this.unpackLootTable(null);
         this.getItems().set(index, itemStack);
         if (itemStack.getCount() > this.getMaxStackSize()) {
@@ -121,70 +112,40 @@ public class FabricBrickHopperBlockEntity extends BrickHopperBlockEntity {
         this.setChanged();
     }
 
-    public static void tick(Level level, BlockPos pos, BlockState state, BrickHopperBlockEntity entity) {
-        if (level != null && !level.isClientSide) {
-            entity.transferCooldown--;
-            entity.tickedGameTime = level.getGameTime();
-            if (!entity.isOnTransferCooldown()) {
-                entity.setTransferCooldown(0);
-                if (entity instanceof FabricBrickHopperBlockEntity blockEntity) {
-                    blockEntity.updateHopper(() -> pullItems(blockEntity));
-                }
-            }
-        }
-    }
-
-    private void updateHopper(Supplier<Boolean> p_200109_1_) {
-        if (this.level != null && !this.level.isClientSide) {
-            if (!this.isOnTransferCooldown() && this.getBlockState().getValue(HopperBlock.ENABLED)) {
-                boolean flag = false;
-                if (!this.isEmpty()) {
-                    flag = this.transferItemsOut();
-                }
-                if (isNotFull(this.inventory)) {
-                    flag |= p_200109_1_.get();
-                }
-                if (flag) {
-                    this.setTransferCooldown(Services.CONFIG.getCooldown());
-                    this.setChanged();
-                }
-            }
-        }
-    }
-
-    private static ItemStack putStackInInventoryAllSlots(BlockEntity source, Object destination, Storage<ItemVariant> destInventory, ItemStack stack) {
-        boolean inventoryWasEmpty = isEmpty(destInventory);
+    @Override
+    protected boolean pullItemsFromItemHandler(Object itemHandler) {
+        Storage<ItemVariant> storage = (Storage<ItemVariant>) itemHandler;
         try (Transaction transaction = Transaction.openOuter()) {
-            long count = destInventory.insert(ItemVariant.of(stack), stack.getCount(), transaction);
-            if (count > 0) {
-                stack.shrink((int)count);
-                if (inventoryWasEmpty && destination instanceof FabricBrickHopperBlockEntity destinationHopper && !destinationHopper.mayTransfer()) {
-                    int k = 0;
-                    if (source instanceof FabricBrickHopperBlockEntity && destinationHopper.getLastUpdateTime() >= ((FabricBrickHopperBlockEntity) source).getLastUpdateTime()) {
-                        k = 1;
+            for (StorageView<ItemVariant> slot : storage.nonEmptyViews()) {
+                if (StorageUtil.simulateExtract(slot, slot.getResource(), 1, transaction) > 0) {
+                    ItemStack extractedItem = slot.getResource().toStack(1);
+                    for (int j = 0; j < this.getContainerSize(); j++) {
+                        ItemStack destStack = this.getItem(j);
+                        if (this.canPlaceItem(j, extractedItem) && (destStack.isEmpty() || destStack.getCount() < destStack.getMaxStackSize()
+                                && destStack.getCount() < this.getMaxStackSize() && ItemStack.isSameItemSameComponents(extractedItem, destStack))) {
+                            if (storage.extract(slot.getResource(), 1, transaction) > 0) {
+                                if (destStack.isEmpty()) {
+                                    this.setItem(j, extractedItem);
+                                } else {
+                                    destStack.grow(1);
+                                    this.setItem(j, destStack);
+                                }
+                                this.setChanged();
+                                transaction.commit();
+                                return true;
+                            }
+                        }
                     }
-                    destinationHopper.setTransferCooldown(Services.CONFIG.getCooldown() - k);
                 }
-                transaction.commit();
-            } else {
-                transaction.abort();
             }
+            transaction.abort();
         }
-        return stack;
+        return false;
     }
 
-    private static Optional<Pair<Storage<ItemVariant>, Object>> getItemHandler(FabricBrickHopperBlockEntity hopper, Direction hopperFacing) {
-        double x = hopper.getLevelX() + (double) hopperFacing.getStepX();
-        double y = hopper.getLevelY() + (double) hopperFacing.getStepY();
-        double z = hopper.getLevelZ() + (double) hopperFacing.getStepZ();
-        return getItemHandler(hopper.getLevel(), x, y, z, hopperFacing.getOpposite());
-    }
-
-    private static Optional<Pair<Storage<ItemVariant>, Object>> getItemHandler(Level level, double x, double y, double z, final Direction side) {
-        int i = Mth.floor(x);
-        int j = Mth.floor(y);
-        int k = Mth.floor(z);
-        BlockPos blockpos = new BlockPos(i, j, k);
+    @Override
+    protected Optional<Pair<Object, Object>> getItemHandler(Level level, double x, double y, double z, final Direction side) {
+        BlockPos blockpos = BlockPos.containing(x, y, z);
         BlockState state = level.getBlockState(blockpos);
         if (state.hasBlockEntity()) {
             BlockEntity blockEntity = level.getBlockEntity(blockpos);
@@ -194,16 +155,19 @@ public class FabricBrickHopperBlockEntity extends BrickHopperBlockEntity {
                     return Optional.of(ImmutablePair.of(storage, blockEntity));
                 }
             }
+            //support vanilla inventory block entities without IItemHandler
+            if (blockEntity instanceof Container container) {
+                return Optional.of(ImmutablePair.of(InventoryStorage.of(container, side), state));
+            }
         }
         //support vanilla inventory blocks without ItemStorage
         Block block = state.getBlock();
-        if (block instanceof WorldlyContainerHolder) {
-            return Optional.of(ImmutablePair.of(InventoryStorage.of(((WorldlyContainerHolder)block).getContainer(state, level, blockpos), side), state));
+        if (block instanceof WorldlyContainerHolder containerHolder) {
+            return Optional.of(ImmutablePair.of(InventoryStorage.of(containerHolder.getContainer(state, level, blockpos), side), state));
         }
         //get entities with item handlers
-        List<Entity> list = level.getEntities((Entity)null,
-                new AABB(x - 0.5D, y - 0.5D, z - 0.5D, x + 0.5D, y + 0.5D, z + 0.5D),
-                (entity) -> (entity instanceof ContainerEntity) && entity.isAlive()); //TODO modded entities with Item Storage?!
+        List<Entity> list = getAllAliveEntitiesAt(level, x, y, z,
+                entity -> entity instanceof Container);
         if (!list.isEmpty()) {
             Entity entity = list.get(level.random.nextInt(list.size()));
             return Optional.of(ImmutablePair.of(InventoryStorage.of((ContainerEntity) entity, side), entity));
@@ -211,8 +175,9 @@ public class FabricBrickHopperBlockEntity extends BrickHopperBlockEntity {
         return Optional.empty();
     }
 
-    private static boolean isNotFull(Storage<ItemVariant> itemHandler) {
-        for (StorageView<ItemVariant> slot : itemHandler) {
+    @Override
+    protected boolean isNotFull(Object itemHandler) {
+        for (StorageView<ItemVariant> slot : (Storage<ItemVariant>) itemHandler) {
             if (slot.isResourceBlank() || slot.getAmount() < slot.getCapacity()) {
                 return true;
             }
@@ -220,7 +185,7 @@ public class FabricBrickHopperBlockEntity extends BrickHopperBlockEntity {
         return false;
     }
 
-    private static boolean isEmpty(Storage<ItemVariant> itemHandler) {
+    private boolean isEmpty(Storage<ItemVariant> itemHandler) {
         for (StorageView<ItemVariant> slot : itemHandler.nonEmptyViews()) {
             if (!slot.isResourceBlank()) {
                 return false;
@@ -229,121 +194,26 @@ public class FabricBrickHopperBlockEntity extends BrickHopperBlockEntity {
         return true;
     }
 
-    private boolean transferItemsOut() {
-        Direction hopperFacing = this.getBlockState().getValue(HopperBlock.FACING);
-        return getItemHandler(this, hopperFacing)
-                .map(destinationResult -> {
-                    Storage<ItemVariant> storage = destinationResult.getKey();
-                    Object destination = destinationResult.getValue();
-                    if (isNotFull(storage)) {
-                        for (int i = 0; i < this.getContainerSize(); ++i) {
-                            if (!this.getItem(i).isEmpty()) {
-                                ItemStack originalSlotContents = this.getItem(i).copy();
-                                ItemStack insertStack = this.removeItem(i, 1);
-                                ItemStack remainder = putStackInInventoryAllSlots(this, destination, storage, insertStack);
-                                if (remainder.isEmpty()) {
-                                    return true;
-                                }
-                                this.setItem(i, originalSlotContents);
-                            }
-                        }
-
-                    }
-                    return false;
-                })
-                .orElse(false);
-    }
-
-    /**
-     * Pull dropped EntityItems from the world above the hopper and items
-     * from any inventory attached to this hopper into the hopper's inventory.
-     *
-     * @param hopper the hopper in question
-     * @return whether any items were successfully added to the hopper
-     */
-    private static boolean pullItems(FabricBrickHopperBlockEntity hopper) {
-        return getItemHandler(hopper, Direction.UP)
-                .map(itemHandlerResult -> {
-                    //get item from item handler
-                    if (Services.CONFIG.isPullItemsFromInventoriesEnabled()) {
-                        Storage<ItemVariant> storage = itemHandlerResult.getKey();
-                        try (Transaction transaction = Transaction.openOuter()) {
-                            for (StorageView<ItemVariant> slot : storage.nonEmptyViews()) {
-                                if (StorageUtil.simulateExtract(slot, slot.getResource(), 1, transaction) > 0) {
-                                    ItemStack extractedItem = slot.getResource().toStack(1);
-                                    for (int j = 0; j < hopper.getContainerSize(); j++) {
-                                        ItemStack destStack = hopper.getItem(j);
-                                        if (hopper.canPlaceItem(j, extractedItem) && (destStack.isEmpty() || destStack.getCount() < destStack.getMaxStackSize()
-                                                && destStack.getCount() < hopper.getMaxStackSize() && canItemStacksStack(extractedItem, destStack))) {
-                                            if (storage.extract(slot.getResource(), 1, transaction) > 0) {
-                                                if (destStack.isEmpty()) {
-                                                    hopper.setItem(j, extractedItem);
-                                                } else {
-                                                    destStack.grow(1);
-                                                    hopper.setItem(j, destStack);
-                                                }
-                                                hopper.setChanged();
-                                                transaction.commit();
-                                                return true;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            transaction.abort();
-                        }
-                    }
-                    return false;
-                }).orElseGet(() -> {
-                    //capture item
-                    if (Services.CONFIG.isPullItemsFromWorldEnabled()) {
-                        for (ItemEntity itementity : getCaptureItems(hopper)) {
-                            if (captureItem(hopper, itementity)) {
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
-                });
-    }
-
-    private static boolean canItemStacksStack(@Nonnull ItemStack a, @Nonnull ItemStack b) {
-        if (!a.isEmpty() && ItemStack.isSameItem(a, b) && a.hasTag() == b.hasTag()) {
-            return (!a.hasTag() || Objects.equals(a.getTag(), b.getTag()));
-        } else {
-            return false;
-        }
-    }
-
-    private static boolean captureItem(FabricBrickHopperBlockEntity hopper, ItemEntity p_200114_1_) {
-        boolean flag = false;
-        ItemStack itemstack = p_200114_1_.getItem().copy();
-        ItemStack itemstack1 = putStackInInventoryAllSlots(null, hopper, hopper.inventory, itemstack);
-        if (itemstack1.isEmpty()) {
-            flag = true;
-            p_200114_1_.remove(Entity.RemovalReason.DISCARDED);
-        } else {
-            p_200114_1_.setItem(itemstack1);
-        }
-        return flag;
-    }
-
-    private static List<ItemEntity> getCaptureItems(FabricBrickHopperBlockEntity p_200115_0_) {
-        return p_200115_0_.getSuckShape().toAabbs().stream().flatMap((p_200110_1_) -> {
-            return p_200115_0_.getLevel().getEntitiesOfClass(ItemEntity.class, p_200110_1_.move(p_200115_0_.getLevelX() - 0.5D, p_200115_0_.getLevelY() - 0.5D, p_200115_0_.getLevelZ() - 0.5D), EntitySelector.ENTITY_STILL_ALIVE).stream();
-        }).collect(Collectors.toList());
+    @Override
+    protected Object getOwnItemHandler() {
+        return this.inventory;
     }
 
     @Override
-    public void onEntityCollision(Entity p_200113_1_) {
-        if (Services.CONFIG.isPullItemsFromWorldEnabled()) {
-            if (p_200113_1_ instanceof ItemEntity) {
-                BlockPos blockpos = this.getBlockPos();
-                if (Shapes.joinIsNotEmpty(Shapes.create(p_200113_1_.getBoundingBox().move((-blockpos.getX()), (-blockpos.getY()), (-blockpos.getZ()))), this.getSuckShape(), BooleanOp.AND)) {
-                    this.updateHopper(() -> captureItem(this, (ItemEntity)p_200113_1_));
-                }
+    protected ItemStack putStackInInventoryAllSlots(BlockEntity source, Object destination, Object destinationItemHandlerObj, ItemStack stack) {
+        Storage<ItemVariant> storage = (Storage<ItemVariant>) destinationItemHandlerObj;
+        boolean inventoryWasEmpty = isEmpty(storage);
+        try (Transaction transaction = Transaction.openOuter()) {
+            long count = storage.insert(ItemVariant.of(stack), stack.getCount(), transaction);
+            if (count > 0) {
+                stack.shrink((int)count);
+                updateCooldown(inventoryWasEmpty, source, destination);
+                transaction.commit();
+            } else {
+                transaction.abort();
             }
         }
+        return stack;
     }
 
 }

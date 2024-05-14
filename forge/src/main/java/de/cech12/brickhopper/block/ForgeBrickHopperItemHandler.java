@@ -4,8 +4,7 @@ import de.cech12.brickhopper.blockentity.BrickHopperBlockEntity;
 import de.cech12.brickhopper.platform.Services;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.wrapper.InvWrapper;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 public class ForgeBrickHopperItemHandler extends InvWrapper
 {
@@ -18,8 +17,8 @@ public class ForgeBrickHopperItemHandler extends InvWrapper
     }
 
     @Override
-    @Nonnull
-    public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate)
+    @NotNull
+    public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate)
     {
         if (simulate) {
             return super.insertItem(slot, stack, true);
@@ -29,7 +28,7 @@ public class ForgeBrickHopperItemHandler extends InvWrapper
             stack = super.insertItem(slot, stack, false);
             if (wasEmpty && originalStackSize > stack.getCount())
             {
-                if (!hopper.mayTransfer())
+                if (hopper.mayNotTransfer())
                 {
                     hopper.setTransferCooldown(Services.CONFIG.getCooldown());
                 }
