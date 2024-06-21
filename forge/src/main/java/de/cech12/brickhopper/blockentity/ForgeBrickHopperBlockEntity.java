@@ -43,7 +43,7 @@ public class ForgeBrickHopperBlockEntity extends BrickHopperBlockEntity {
         super.loadAdditional(nbt, provider);
         inventory = new ItemStackHandler(3);
         if (!this.tryLoadLootTable(nbt)) {
-            this.inventory.deserializeNBT(nbt);
+            this.inventory.deserializeNBT(provider, nbt);
         }
     }
 
