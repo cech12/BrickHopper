@@ -8,8 +8,9 @@
   "text.autoconfig.brickhopper.option.COOLDOWN": "Brick Hopper Cooldown",
   "text.autoconfig.brickhopper.option.COOLDOWN.@Tooltip[0]": "§6§lBrick Hopper Cooldown",
   "text.autoconfig.brickhopper.option.COOLDOWN.@Tooltip[1]": "Time (ticks) that passes between two Brick Hopper operations.",
-  "text.autoconfig.brickhopper.option.COOLDOWN.@Tooltip[2]": "§7§oDefault: 12",
-  "text.autoconfig.brickhopper.option.COOLDOWN.@Tooltip[3]": "§7§o(Vanilla Hopper: 8)",
+  "text.autoconfig.brickhopper.option.COOLDOWN.@Tooltip[2]": "§7§oMin: 1; Max: 1000",
+  "text.autoconfig.brickhopper.option.COOLDOWN.@Tooltip[3]": "§7§oDefault: 12",
+  "text.autoconfig.brickhopper.option.COOLDOWN.@Tooltip[4]": "§7§o(Vanilla Hopper: 8)",
 
   "text.autoconfig.brickhopper.option.PULL_ITEMS_FROM_WORLD_ENABLED": "Brick Hopper pulls from world",
   "text.autoconfig.brickhopper.option.PULL_ITEMS_FROM_WORLD_ENABLED.@Tooltip[0]": "§6§lBrick Hopper pulls items from world",
