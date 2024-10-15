@@ -16,8 +16,8 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 @Mod.EventBusSubscriber(modid= Constants.MOD_ID, bus= Mod.EventBusSubscriber.Bus.MOD)
 public class ForgeBrickHopperMod {
 
-    public ForgeBrickHopperMod() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public ForgeBrickHopperMod(FMLJavaModLoadingContext context) {
+        IEventBus modEventBus = context.getModEventBus();
         ForgeRegistryHelper.BLOCKS.register(modEventBus);
         ForgeRegistryHelper.ITEMS.register(modEventBus);
         ForgeRegistryHelper.BLOCK_ENTITY_TYPES.register(modEventBus);
