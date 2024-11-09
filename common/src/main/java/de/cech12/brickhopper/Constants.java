@@ -23,6 +23,7 @@ public class Constants {
     public static final String MOD_NAME = "Brick Hopper";
     /** Logger instance */
     public static final Logger LOG = LoggerFactory.getLogger(MOD_NAME);
+    public static final String BLOCK_ITEM_NAME = "brick_hopper";
 
     public static Supplier<Block> BRICK_HOPPER_BLOCK;
     public static Supplier<Item> BRICK_HOPPER_ITEM;

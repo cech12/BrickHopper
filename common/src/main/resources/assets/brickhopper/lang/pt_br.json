@@ -1,4 +1,6 @@
 {
+  "item.brickhopper.brick_hopper": "Funil de Tijolos",
+
   "block.brickhopper.brick_hopper": "Funil de Tijolos",
   "block.brickhopper.brick_hopper.desc.cannotAbsorbItemsFromWorld": "Não é possível puxar itens ou entidades acima do funil.",
   "block.brickhopper.brick_hopper.desc.cannotAbsorbItemsFromInventories": "Não é possível retirar itens dos inventários acima do funil."

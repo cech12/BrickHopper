@@ -8,6 +8,7 @@ import de.cech12.brickhopper.inventory.BrickHopperContainer;
 import de.cech12.brickhopper.platform.services.IRegistryHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -31,15 +32,15 @@ public class NeoForgeRegistryHelper implements IRegistryHelper {
     public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(BuiltInRegistries.MENU, Constants.MOD_ID);
 
     static {
-        DeferredBlock<Block> block = BLOCKS.register("brick_hopper", () -> new BrickHopperBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.5F).sound(SoundType.WOOD).noOcclusion()));
+        DeferredBlock<Block> block = BLOCKS.register(Constants.BLOCK_ITEM_NAME, () -> new BrickHopperBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.5F).sound(SoundType.WOOD).noOcclusion().setId(ResourceKey.create(BuiltInRegistries.BLOCK.key(), Constants.id(Constants.BLOCK_ITEM_NAME)))));
         Constants.BRICK_HOPPER_BLOCK = block;
-        Constants.BRICK_HOPPER_ITEM = fromBlock(block);
-        Constants.BRICK_HOPPER_BLOCK_ENTITY_TYPE = BLOCK_ENTITY_TYPES.register("brick_hopper", () -> BlockEntityType.Builder.of(NeoForgeBrickHopperBlockEntity::new, Constants.BRICK_HOPPER_BLOCK.get()).build(null));
+        Constants.BRICK_HOPPER_ITEM = fromBlock(Constants.BLOCK_ITEM_NAME, block);
+        Constants.BRICK_HOPPER_BLOCK_ENTITY_TYPE = BLOCK_ENTITY_TYPES.register("brick_hopper", () -> new BlockEntityType<>(NeoForgeBrickHopperBlockEntity::new, Constants.BRICK_HOPPER_BLOCK.get()));
         Constants.BRICK_HOPPER_MENU_TYPE = MENU_TYPES.register("brickhopper", () -> IMenuTypeExtension.create((pWindowID, pInventory, pData) -> new BrickHopperContainer(pWindowID, pInventory)));
     }
 
-    private static DeferredItem<Item> fromBlock(DeferredBlock<Block> block) {
-        return ITEMS.register(block.getId().getPath(), () -> new BlockItem(block.get(), new Item.Properties()));
+    private static DeferredItem<Item> fromBlock(String name, DeferredBlock<Block> block) {
+        return ITEMS.register(block.getId().getPath(), () -> new BlockItem(block.get(), new Item.Properties().setId(ResourceKey.create(BuiltInRegistries.ITEM.key(), Constants.id(name)))));
     }
 
     @Override

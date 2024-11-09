@@ -7,12 +7,8 @@
     " B "
   ],
   "key": {
-    "B": {
-      "tag": "c:bricks/normal"
-    },
-    "C": {
-      "tag": "c:chests/wooden"
-    }
+    "B": "#c:bricks/normal",
+    "C": "#c:chests/wooden"
   },
   "result": {
     "id": "brickhopper:brick_hopper"
