@@ -4,6 +4,7 @@ import de.cech12.brickhopper.block.FabricBrickHopperBlock;
 import de.cech12.brickhopper.blockentity.BrickHopperBlockEntity;
 import de.cech12.brickhopper.blockentity.FabricBrickHopperBlockEntity;
 import de.cech12.brickhopper.inventory.BrickHopperContainer;
+import de.cech12.brickhopper.item.BrickHopperItem;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -15,7 +16,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -27,7 +27,7 @@ import net.minecraft.world.level.material.MapColor;
 public class FabricBrickHopperMod implements ModInitializer {
 
     private static final Block BRICK_HOPPER_BLOCK = Registry.register(BuiltInRegistries.BLOCK, Constants.id(Constants.BLOCK_ITEM_NAME), new FabricBrickHopperBlock(BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.5F).sound(SoundType.WOOD).noOcclusion().setId(ResourceKey.create(BuiltInRegistries.BLOCK.key(), Constants.id(Constants.BLOCK_ITEM_NAME)))));
-    private static final Item BRICK_HOPPER_ITEM = Registry.register(BuiltInRegistries.ITEM, Constants.id(Constants.BLOCK_ITEM_NAME), new BlockItem(BRICK_HOPPER_BLOCK, new Item.Properties().setId(ResourceKey.create(BuiltInRegistries.ITEM.key(), Constants.id(Constants.BLOCK_ITEM_NAME)))));
+    private static final Item BRICK_HOPPER_ITEM = Registry.register(BuiltInRegistries.ITEM, Constants.id(Constants.BLOCK_ITEM_NAME), new BrickHopperItem(BRICK_HOPPER_BLOCK, new Item.Properties().setId(ResourceKey.create(BuiltInRegistries.ITEM.key(), Constants.id(Constants.BLOCK_ITEM_NAME)))));
     private static final BlockEntityType<? extends BrickHopperBlockEntity> BRICK_HOPPER_BLOCK_ENTITY_TYPE = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Constants.id(Constants.BLOCK_ITEM_NAME), FabricBlockEntityTypeBuilder.create(FabricBrickHopperBlockEntity::new, BRICK_HOPPER_BLOCK).build(null));
     private static final MenuType<BrickHopperContainer> BRICK_HOPPER_MENU_TYPE = Registry.register(BuiltInRegistries.MENU, Constants.id("brickhopper"), new ExtendedScreenHandlerType<>((pWindowID, pInventory, pData) -> new BrickHopperContainer(pWindowID, pInventory), HopperData.CODEC));
 

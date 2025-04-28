@@ -5,12 +5,12 @@ import de.cech12.brickhopper.block.BrickHopperBlock;
 import de.cech12.brickhopper.blockentity.BrickHopperBlockEntity;
 import de.cech12.brickhopper.blockentity.NeoForgeBrickHopperBlockEntity;
 import de.cech12.brickhopper.inventory.BrickHopperContainer;
+import de.cech12.brickhopper.item.BrickHopperItem;
 import de.cech12.brickhopper.platform.services.IRegistryHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -40,7 +40,7 @@ public class NeoForgeRegistryHelper implements IRegistryHelper {
     }
 
     private static DeferredItem<Item> fromBlock(String name, DeferredBlock<Block> block) {
-        return ITEMS.register(block.getId().getPath(), () -> new BlockItem(block.get(), new Item.Properties().setId(ResourceKey.create(BuiltInRegistries.ITEM.key(), Constants.id(name)))));
+        return ITEMS.register(block.getId().getPath(), () -> new BrickHopperItem(block.get(), new Item.Properties().setId(ResourceKey.create(BuiltInRegistries.ITEM.key(), Constants.id(name)))));
     }
 
     @Override
