@@ -1,19 +1,15 @@
 package de.cech12.brickhopper;
 
-import de.cech12.brickhopper.block.NeoForgeBrickHopperItemHandler;
-import de.cech12.brickhopper.client.BrickHopperScreen;
 import de.cech12.brickhopper.platform.NeoForgeRegistryHelper;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
 
 @SuppressWarnings("unused")
 @Mod(Constants.MOD_ID)
@@ -28,15 +24,9 @@ public class NeoForgeBrickHopperMod {
         CommonLoader.init();
     }
 
-    @OnlyIn(Dist.CLIENT)
-    @SubscribeEvent
-    public static void onMenuScreenRegister(RegisterMenuScreensEvent event) {
-        event.register(Constants.BRICK_HOPPER_MENU_TYPE.get(), BrickHopperScreen::new);
-    }
-
     @SubscribeEvent
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, Constants.BRICK_HOPPER_BLOCK_ENTITY_TYPE.get(), (blockEntity, side) -> new NeoForgeBrickHopperItemHandler(blockEntity));
+        event.registerBlockEntity(Capabilities.Item.BLOCK, Constants.BRICK_HOPPER_BLOCK_ENTITY_TYPE.get(), (blockEntity, side) -> VanillaContainerWrapper.of(blockEntity));
     }
 
     @SubscribeEvent
