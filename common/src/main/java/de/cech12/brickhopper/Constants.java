@@ -2,7 +2,7 @@ package de.cech12.brickhopper;
 
 import de.cech12.brickhopper.blockentity.BrickHopperBlockEntity;
 import de.cech12.brickhopper.inventory.BrickHopperContainer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -32,8 +32,8 @@ public class Constants {
 
     private Constants() {}
 
-    public static ResourceLocation id(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
+    public static Identifier id(String name) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, name);
     }
 
 }

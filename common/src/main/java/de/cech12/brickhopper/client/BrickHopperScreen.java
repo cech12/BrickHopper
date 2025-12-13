@@ -6,13 +6,13 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 public class BrickHopperScreen extends AbstractContainerScreen<BrickHopperContainer> {
-    /** The ResourceLocation containing the gui texture for the hopper */
-    private static final ResourceLocation HOPPER_GUI_TEXTURE = Constants.id("textures/gui/container/brick_hopper.png");
+    /** The Identifier containing the gui texture for the hopper */
+    private static final Identifier HOPPER_GUI_TEXTURE = Constants.id("textures/gui/container/brick_hopper.png");
 
     public BrickHopperScreen(BrickHopperContainer screenContainer, Inventory inv, Component titleIn) {
         super(screenContainer, inv, titleIn);
