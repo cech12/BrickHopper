@@ -19,7 +19,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "brickhopper:brick_hopper"
+        "recipes": "brickhopper:brick_hopper"
       }
     }
   },
